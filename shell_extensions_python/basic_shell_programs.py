@@ -5,12 +5,14 @@ Implements basic unix uitilities.
 import os
 import os.path
 
+import shutil
 import errno
 
 import glob as pyglob
 
 from .shell_types import shell_str, shell_list
 from .path_manipulation import expand_user
+from .interactive import ask_question
 
 def ls(path='.', sort_key=lambda x: x):
     """
@@ -52,6 +54,26 @@ def pwd():
     Get the present working directory as a shell_str
     """
     return shell_str(os.getcwd())
+
+def rm(path, ignore_missing=False, remove_recursively=False, interactive=True):
+    path = expand_user(path)
+    if not os.path.exists(path):
+        raise RuntimeError("The file %s cannot be removed as it does not exist" % path)
+    elif os.path.isdir(path):
+        if ls(path) == []:
+            os.rmdir(path)
+        elif remove_recursively:
+            shutil.rmtree(path)
+        elif interactive:
+            if ask_question("Are you sure you want to remove %s: it is a directory with contents [yN]: " % path) == 'y':
+                shutil.rmtree(path)
+        else:
+            raise RuntimeError("Cannot remove directory %s, it has contents" % path)
+    elif os.path.isfile(path):
+        os.remove(path)
+    else:
+        raise RuntimeError("The path %s represents an existing file that is not a directory or normal file" % path)
+
 
 def mkdir(folder, error_if_exists=False):
     """
