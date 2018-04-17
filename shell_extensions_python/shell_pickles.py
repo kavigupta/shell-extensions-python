@@ -6,14 +6,14 @@ def ploads(filename, limit=float('inf')):
     Loads several pickles.
     """
     pickles = []
-    try:
-        while True:
-            with open(filename, 'rb') as f:
+    with open(filename, 'rb') as f:
+        try:
+            while True:
                 pickles.append(pickle.load(f))
-            if len(pickles) >= limit:
-                break
-    except EOFError:
-        pass
+                if len(pickles) >= limit:
+                    break
+        except EOFError:
+            pass
     return pickles
 
 def pload(filename):
@@ -34,7 +34,7 @@ def psaves(filename, pickles):
     """
     with open(filename, 'wb') as f:
         for pick in pickles:
-            pickle.dump(f, pick)
+            pickle.dump(pick, f)
 
 def psave(filename, pickl):
     """
