@@ -14,7 +14,7 @@ from .shell_types import shell_str, shell_list
 from .path_manipulation import expand_user
 from .interactive import ask_question
 
-def ls(path='.', sort_key=lambda x: x):
+def ls(path='.', sort_key=lambda x: x, a=True, full=False):
     """
     Returns a listing of the given path, sorted by name by default
 
@@ -24,6 +24,10 @@ def ls(path='.', sort_key=lambda x: x):
     result = shell_list(os.listdir(expand_user(path)))
     if sort_key is not None:
         result.sort(key=sort_key)
+    if not a:
+        result = [x for x in result if x[0] != '.']
+    if full:
+        result = [os.path.join(path, x) for x in result]
     return result
 
 def cat(filename, mode=''):
