@@ -33,7 +33,6 @@ class Tests(unittest.TestCase):
         self.assertEqual(cat('test.py'), 'hi!!!')
         rm('test.py')
         self.assertEqual(ls(), [])
-
     @reset
     def test_pickle(self):
         psave('test.pkl', [1, 2, 3])
