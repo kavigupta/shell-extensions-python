@@ -29,8 +29,11 @@ class Tests(unittest.TestCase):
     @reset
     def test_add_file(self):
         write('test.py', 'hi!!!')
+        self.assertEqual(ls(), ['test.py'])
         self.assertEqual(cat('test.py'), 'hi!!!')
         rm('test.py')
+        self.assertEqual(ls(), [])
+
 
 if __name__ == '__main__':
     unittest.main()
