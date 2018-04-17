@@ -1,3 +1,6 @@
+"""
+A module containing functions that load and save pickle files automatically.
+"""
 
 import pickle
 

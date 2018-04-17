@@ -62,6 +62,13 @@ def pwd():
     return ShellStr(os.getcwd())
 
 def rm(path, ignore_missing=False, remove_recursively=False, interactive=True):
+    """
+    Removes the given normal file or empty folder.
+
+    ignore_missing: do not error if the file does not exist
+    remove_recursively: remove a directory recursively if it contains values
+    interactive: prompt rather than erroring if you encounter a file you are not allowed to delete
+    """
     path = expand_user(path)
     if not os.path.exists(path):
         if ignore_missing:

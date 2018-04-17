@@ -1,9 +1,16 @@
+"""
+Contains functions relevant to user interaction.
+"""
+
 
 import os
 from enum import Enum
 from colorama import Fore, Style
 
 def ask_question(prompt):
+    """
+    Ask the user a question
+    """
     return input(prompt)
 
 class FileType(Enum):
