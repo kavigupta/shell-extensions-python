@@ -3,7 +3,7 @@ from os.path import expanduser, join
 from os import system
 import unittest
 
-from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm
+from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave
 
 system('rm -r tests/* tests/.*')
 mkdir('tests')
@@ -33,6 +33,12 @@ class Tests(unittest.TestCase):
         self.assertEqual(cat('test.py'), 'hi!!!')
         rm('test.py')
         self.assertEqual(ls(), [])
+
+    @reset
+    def test_pickle(self):
+        psave('test.pkl', [1, 2, 3])
+        self.assertEqual(pload('test.pkl'), [1, 2, 3])
+        rm('test.pkl')
 
 
 if __name__ == '__main__':
