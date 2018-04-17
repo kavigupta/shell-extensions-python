@@ -64,7 +64,10 @@ def pwd():
 def rm(path, ignore_missing=False, remove_recursively=False, interactive=True):
     path = expand_user(path)
     if not os.path.exists(path):
-        raise RuntimeError("The file %s cannot be removed as it does not exist" % path)
+        if ignore_missing:
+            return
+        else:
+            raise RuntimeError("The file %s cannot be removed as it does not exist" % path)
     elif os.path.isdir(path):
         if ls(path) == []:
             os.rmdir(path)
