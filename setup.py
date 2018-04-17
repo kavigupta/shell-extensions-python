@@ -9,4 +9,5 @@ setup(name='shell-extensions-python',
       author_email='kavi@berkeley.edu',
       license='GPL 3.0',
       packages=['shell_extensions_python'],
-      zip_safe=False)
+      zip_safe=False,
+      install_requires=['colorama'])

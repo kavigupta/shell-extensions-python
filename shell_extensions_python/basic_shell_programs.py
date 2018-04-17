@@ -12,7 +12,7 @@ import glob as pyglob
 
 from .shell_types import shell_str, shell_list
 from .path_manipulation import expand_user
-from .interactive import ask_question
+from .interactive import ask_question, DisplayPath
 
 def ls(path='.', sort_key=lambda x: x, a=True, full=False):
     """
@@ -21,14 +21,16 @@ def ls(path='.', sort_key=lambda x: x, a=True, full=False):
     path: the directory to list the contents of
     sort_key: the key by which to sort the results, or None if you don't want the results sorted.
     """
-    result = shell_list(os.listdir(expand_user(path)))
+    path = expand_user(path)
+    result = os.listdir(path)
+    result = [DisplayPath(spath, context=path) for spath in result]
     if sort_key is not None:
         result.sort(key=sort_key)
     if not a:
         result = [x for x in result if x[0] != '.']
     if full:
         result = [os.path.join(path, x) for x in result]
-    return result
+    return shell_list(result)
 
 def cat(filename, mode=''):
     """
