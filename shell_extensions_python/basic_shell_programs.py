@@ -10,7 +10,7 @@ import errno
 
 import glob as pyglob
 
-from .shell_types import shell_str, shell_list
+from .shell_types import ShellStr, ShellList
 from .path_manipulation import expand_user
 from .interactive import ask_question, DisplayPath
 
@@ -30,15 +30,15 @@ def ls(path='.', sort_key=lambda x: x, a=True, full=False):
         result = [x for x in result if x[0] != '.']
     if full:
         result = [os.path.join(path, x) for x in result]
-    return shell_list(result)
+    return ShellList(result)
 
 def cat(filename, mode=''):
     """
-    Loads the given file as a shell_str.
+    Loads the given file as a ShellStr.
     """
     assert 'w' not in mode
     with open(expand_user(filename), mode + 'r') as f:
-        return shell_str(f.read())
+        return ShellStr(f.read())
 
 def write(filename, contents, clobber=False, append=False):
     """
@@ -57,9 +57,9 @@ def write(filename, contents, clobber=False, append=False):
 
 def pwd():
     """
-    Get the present working directory as a shell_str
+    Get the present working directory as a ShellStr
     """
-    return shell_str(os.getcwd())
+    return ShellStr(os.getcwd())
 
 def rm(path, ignore_missing=False, remove_recursively=False, interactive=True):
     path = expand_user(path)
