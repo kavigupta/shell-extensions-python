@@ -33,7 +33,7 @@ class FileType(Enum):
 
 class DisplayPath(str):
     """
-    A display path, which is exactly like a string, except that it __repr__'s colored in. 
+    A display path, which is exactly like a string, except that it __repr__'s colored in.
     """
     def __new__(cls, path, context):
         result = str.__new__(cls, path)
