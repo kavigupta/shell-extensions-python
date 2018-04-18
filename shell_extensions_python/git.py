@@ -133,3 +133,39 @@ def status_summary():
             continue
         results.append(FileStatus.of(line))
     return results
+
+def push(remote=None, branch=None):
+    """
+    Calls git push
+    """
+    command = ['git', 'push']
+    if remote is not None:
+        command.append(remote)
+    if branch is not None:
+        command.append(branch)
+    r(command)
+
+def add(*paths):
+    """
+    Calls git add
+    """
+    r(['git', 'add'] + list(paths))
+
+def show_staged():
+    """
+    Calls git diff --staged, shows staged changes
+    """
+    r(['git', 'diff', '--staged'])
+
+def commit(message, review=False):
+    """
+    Calls git commit -m
+
+    If review is True, it shows you what you are about to stage
+        and asks you if you want to continue
+    """
+    if review:
+        show_staged()
+        if not input("Do you want to commit? [yN] ") == "y":
+            return
+    r(['git', 'commit', '-m', message])
