@@ -96,7 +96,7 @@ class GitStatusRenderer(Renderer):
         result = ", ".join(newoffs)
         if result == "":
             return ""
-        return reset + "[" + result + reset + "]"
+        return reset + " [" + result + reset + "]"
     def process_status(self, prefix, count):
         """
         Colors the given status and count, and places an @ in between
@@ -120,7 +120,7 @@ class GitStatusRenderer(Renderer):
         return reset + " <" + summary + reset + ">"
     def render(self):
         try:
-            return self.render_branch() + " " + self.git_offsets() + self.one_line_status()
+            return self.render_branch() + self.git_offsets() + self.one_line_status()
         except ProcessFailedException:
             return ""
 
