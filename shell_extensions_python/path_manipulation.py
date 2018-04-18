@@ -18,3 +18,15 @@ def unexpand_user(path):
     if path.startswith(home):
         path = "~" + path[len(home):]
     return path
+
+def basename(path):
+    """
+    Get the filename of the given path
+    """
+    return os.path.basename(path)
+
+def dirname(path):
+    """
+    Get the directory of the given path
+    """
+    return os.path.dirname(path)
