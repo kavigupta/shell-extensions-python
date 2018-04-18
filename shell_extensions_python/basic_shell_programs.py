@@ -7,6 +7,7 @@ import os.path
 
 import shutil
 import errno
+import getpass
 
 import glob as pyglob
 
@@ -147,3 +148,9 @@ def glob(glob_str):
         raise RuntimeError("Multiple matches for %s: %s matches found" % (glob_str, len(results)))
     else:
         return results[0]
+
+def whoami():
+    """
+    Get the current user
+    """
+    return getpass.getuser()
