@@ -4,6 +4,8 @@ Various functions to help run shell commands.
 
 import subprocess
 
+from .path_manipulation import expand_user
+
 def iterable(value):
     """
     Returns True iff the given value is iterable
@@ -45,3 +47,15 @@ def r(command, std=False, err=False, throw=False):
     if result.returncode != 0 and throw:
         raise throw("Bad exit code: %s" % result.returncode)
     return result
+
+def less(path):
+    """
+    Runs the linux command less on a file
+    """
+    return r(['less', expand_user(path)])
+
+def cp(src, dest):
+    """
+    Runs the linux command cp on a file
+    """
+    return r(['cp', expand_user(src), expand_user(dest)])
