@@ -1,9 +1,9 @@
 # pylint: disable-all
 
-from shell_extensions_python import *
+from .__init__ import *
 
-from shell_extensions_python.ps1 import SeriesRenderer, UserRenderer, GitPathRenderer, GitStatusRenderer
-from colors import *
+from .ps1 import SeriesRenderer, UserRenderer, GitPathRenderer, GitStatusRenderer
+from .colors import *
 
 SeriesRenderer(
     UserRenderer(user_color=yellow_bright),
