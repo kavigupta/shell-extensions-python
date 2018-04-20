@@ -64,6 +64,13 @@ def tracking_branch():
     return upstream.stdout.decode('utf-8').strip()
 
 @check_in_repository
+def set_tracking_branch(to_track):
+    """
+    Sets the branch this branch is tracking
+    """
+    r(('git', 'branch', '-u', to_track))
+
+@check_in_repository
 def commits_wrt_tracking():
     """
     Get the number of commits off from the tracking branch (ahead, behind)
