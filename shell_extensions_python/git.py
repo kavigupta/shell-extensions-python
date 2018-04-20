@@ -176,3 +176,9 @@ def commit(message, review=False):
         if not input("Do you want to commit? [yN] ") == "y":
             return
     r(['git', 'commit', '-m', message])
+
+def pull_ff():
+    """
+    Calls git commit --ff-only. Returns False if it doesn't succeed.
+    """
+    return bool(r(['git', 'pull', '--ff-only']))
