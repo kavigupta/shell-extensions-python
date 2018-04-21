@@ -21,8 +21,7 @@ def reset(fn):
         self.assertEqual(ls(), [])
     return modified
 
-class Tests(unittest.TestCase):
-
+class TestCd(unittest.TestCase):
     @reset
     def test_basic_cd(self):
         cd()
@@ -54,6 +53,8 @@ class Tests(unittest.TestCase):
         self.assertEqual(cat('path/to/folder/file.txt'), "hello")
         rm('path', recursively=True)
 
+
+class TestLs(unittest.TestCase):
     @reset
     def test_empty_ls(self):
         self.assertEqual(ls(), [])
@@ -88,6 +89,7 @@ class Tests(unittest.TestCase):
         for path in paths:
             rm(path)
 
+class TestWrite(unittest.TestCase):
     @reset
     def test_add_file(self):
         write('test.py', 'hi!!!')
@@ -107,13 +109,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(cat('test'), 'first line modified\nsecond line\n')
         rm('test')
 
-    @reset
-    def test_chaining(self):
-        write('test', '') and write('test2', '')
-        self.assertEqual(ls(), ['test', 'test2'])
-        rm('test')
-        rm('test2')
-
+class TestRm(unittest.TestCase):
     @reset
     def test_rm_dne(self):
         self.assertRaises(FileNotFoundError, lambda: rm('does-not-exist'))
@@ -141,17 +137,26 @@ class Tests(unittest.TestCase):
         rm("path")
         self.assertEqual([], ls())
 
+class TestPickle(unittest.TestCase):
     @reset
     def test_pickle(self):
         psave('test.pkl', [1, 2, 3])
         self.assertEqual(pload('test.pkl'), [1, 2, 3])
         rm('test.pkl')
 
+class TestRun(unittest.TestCase):
+    @reset
+    def test_chaining(self):
+        write('test', '') and write('test2', '')
+        self.assertEqual(ls(), ['test', 'test2'])
+        rm('test')
+        rm('test2')
     @reset
     def test_exit_code(self):
         self.assertEqual(True, bool(r('true')))
         self.assertEqual(False, bool(r('false')))
 
+class TestCp(unittest.TestCase):
     @reset
     def test_cp(self):
         self.fail("This is not covered")
