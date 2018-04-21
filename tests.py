@@ -107,6 +107,12 @@ class Tests(unittest.TestCase):
         self.assertEqual(cat('test'), 'first line modified\nsecond line\n')
         rm('test')
 
+    @reset
+    def test_chaining(self):
+        write('test', '') and write('test2', '')
+        self.assertEqual(ls(), ['test', 'test2'])
+        rm('test')
+        rm('test2')
 
     @reset
     def test_rm_dne(self):
@@ -145,6 +151,10 @@ class Tests(unittest.TestCase):
     def test_exit_code(self):
         self.assertEqual(True, bool(r('true')))
         self.assertEqual(False, bool(r('false')))
+
+    @reset
+    def test_cp(self):
+        self.fail("This is not covered")
 
 if __name__ == '__main__':
     unittest.main()
