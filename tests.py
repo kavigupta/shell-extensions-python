@@ -92,6 +92,18 @@ class Tests(unittest.TestCase):
         rm('test.py')
 
     @reset
+    def test_write_options(self):
+        write('test', 'first line\n')
+        self.assertEqual(ls(), ['test'])
+        self.assertEqual(cat('test'), 'first line\n')
+        self.assertRaises(FileExistsError, lambda: write('test', 'first line\n'))
+        write('test', 'first line modified\n', clobber=True)
+        self.assertEqual(cat('test'), 'first line modified\n')
+        write('test', 'second line\n', append=True)
+        self.assertEqual(cat('test'), 'first line modified\nsecond line\n')
+        rm('test')
+
+    @reset
     def test_pickle(self):
         psave('test.pkl', [1, 2, 3])
         self.assertEqual(pload('test.pkl'), [1, 2, 3])
