@@ -20,7 +20,7 @@ def current_repository():
     Get a path to the current repository or raise an error
     """
     result = r(('git', 'rev-parse', '--show-toplevel'), std=True, err=True, throw=NoRepositoryError)
-    return result.stdout.decode('utf-8').strip()
+    return result.stdout(single_line=True)
 
 def check_in_repository(func):
     """
@@ -51,7 +51,7 @@ def current_branch():
     Get the current branch we are on as a string
     """
     result = r(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), std=True, err=True, throw=True)
-    return result.stdout.decode('utf-8').strip()
+    return result.stdout(single_line=True)
 
 @check_in_repository
 def tracking_branch():
@@ -59,9 +59,9 @@ def tracking_branch():
     Get the branch we are tracking
     """
     symbolic = r(('git', 'symbolic-ref', '-q', 'HEAD'), std=True, err=True, throw=True)
-    current_symbol_ref = symbolic.stdout.decode('utf-8').strip()
+    current_symbol_ref = symbolic.stdout(single_line=True)
     upstream = r((('git', 'for-each-ref', "--format=%(upstream:short)", current_symbol_ref)), std=True, err=True)
-    return upstream.stdout.decode('utf-8').strip()
+    return upstream.stdout(single_line=True)
 
 @check_in_repository
 def set_tracking_branch(to_track):
@@ -79,7 +79,7 @@ def commits_wrt_tracking():
                         current_branch() + "..." + tracking_branch()), std=True, err=True)
     if result.returncode != 0:
         return
-    ahead, behind = result.stdout.decode('utf-8').strip().split()
+    ahead, behind = result.stdout(single_line=True).split()
     return int(ahead), int(behind)
 
 @check_in_repository
@@ -134,7 +134,7 @@ def status_summary():
     Ouput a list [(status, path)] for all files that would be output by git status.
     """
     results = []
-    for line in r(('git', 'status', '--porcelain'), throw=True, std=True, err=True).stdout.decode('utf-8').split('\n'):
+    for line in r(('git', 'status', '--porcelain'), throw=True, std=True, err=True).stdout(as_lines=True):
         line = line.strip('\r\n')
         if not line:
             continue

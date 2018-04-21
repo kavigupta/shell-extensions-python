@@ -3,6 +3,7 @@ Various functions to help run shell commands.
 """
 
 import subprocess
+import os
 
 from .path_manipulation import expand_user
 
@@ -21,6 +22,28 @@ class ProcessFailedException(RuntimeError):
     An exception representing a failed process
     """
     pass
+
+class ShellResult:
+    """
+    Represents the result of calling a shell program
+    """
+    def __init__(self, completed_process):
+        self.completed_process = completed_process
+    def __bool__(self):
+        return self.completed_process == 0
+    @staticmethod
+    def _process(raw, single_line, as_lines):
+        result = raw.decode('utf-8')
+        if single_line:
+            lines = [x for x in result.split(os.linesep) if x]
+            if len(lines) != 1:
+                raise RuntimeError("Not exactly one line: %s" % lines)
+            result = lines[0]
+        elif as_lines:
+            result = result.split(os.linesep)
+        return result
+    def stdout(self, single_line=False, as_lines=False):
+        return self._process(self.completed_process.stdout, single_line=single_line, as_lines=as_lines)
 
 def r(command, std=False, err=False, throw=False):
     """
@@ -46,7 +69,7 @@ def r(command, std=False, err=False, throw=False):
         raise RuntimeError("Expected str or some iterable, but got %s" % type(command))
     if result.returncode != 0 and throw:
         raise throw("Bad exit code: %s" % result.returncode)
-    return result
+    return ShellResult(result)
 
 def less(path):
     """
