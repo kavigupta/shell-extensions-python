@@ -6,6 +6,8 @@ from random import randint
 
 from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave, r, CannotRemoveDirectoryError
 
+from shell_extensions_python.interactive import Interactive
+
 INITIAL_PWD = join(pwd(), 'tests')
 def reset(fn):
     def modified(self, *args):
@@ -105,6 +107,29 @@ class Tests(unittest.TestCase):
         self.assertEqual(cat('test'), 'first line modified\nsecond line\n')
         rm('test')
 
+
+    @reset
+    def test_rm_dne(self):
+        self.assertRaises(FileNotFoundError, lambda: rm('does-not-exist'))
+        rm('does-not-exist', ignore_missing=True)
+
+    @reset
+    def test_rmdir(self):
+        mkdir('empty-folder')
+        rm('empty-folder')
+        self.assertEqual([], ls())
+    @reset
+    def test_rm_nonemptydir(self):
+        mkdir('path')
+        write('path/file', 'contents')
+        self.assertRaises(CannotRemoveDirectoryError, lambda: rm('path', interactive=False))
+        self.assertEqual(['path'], ls())
+        rm('path', recursively=True)
+        self.assertEqual([], ls())
+        mkdir('path')
+        write('path/file', '')
+        Interactive.ask_question = lambda _: "n"
+        rm('path')
     @reset
     def test_pickle(self):
         psave('test.pkl', [1, 2, 3])
