@@ -43,6 +43,11 @@ class ShellResult:
             result = result.split(os.linesep)
         return result
     def stdout(self, single_line=False, as_lines=False):
+        """
+        Output the stdout as a string with possible modifications
+            single_line: strip away all leading and trailing whitespace, and error if there is more than one line
+            as_lines: return a list of lines.
+        """
         return self._process(self.completed_process.stdout, single_line=single_line, as_lines=as_lines)
 
 def r(command, std=False, err=False, throw=False):
