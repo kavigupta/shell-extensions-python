@@ -6,8 +6,8 @@ from enum import Enum
 from collections import namedtuple
 
 from .run_shell_commands import r
-
 from .basic_shell_programs import pwd
+from .shell_types import ShellBool
 
 class NoRepositoryError(RuntimeError):
     """
@@ -172,7 +172,7 @@ def commit(message, review=False):
     if review:
         show_staged()
         if not input("Do you want to commit? [yN] ") == "y":
-            return
+            return ShellBool.false
     return r(['git', 'commit', '-m', message])
 
 def pull_ff():
