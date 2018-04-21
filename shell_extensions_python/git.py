@@ -148,19 +148,19 @@ def push(remote=None, branch=None):
         command.append(remote)
     if branch is not None:
         command.append(branch)
-    r(command)
+    return r(command)
 
 def add(*paths):
     """
     Calls git add
     """
-    r(['git', 'add'] + list(paths))
+    return r(['git', 'add'] + list(paths))
 
 def show_staged():
     """
     Calls git diff --staged, shows staged changes
     """
-    r(['git', 'diff', '--staged'])
+    return r(['git', 'diff', '--staged'])
 
 def commit(message, review=False):
     """
@@ -173,10 +173,15 @@ def commit(message, review=False):
         show_staged()
         if not input("Do you want to commit? [yN] ") == "y":
             return
-    r(['git', 'commit', '-m', message])
+    return r(['git', 'commit', '-m', message])
 
 def pull_ff():
     """
     Calls git commit --ff-only. Returns False if it doesn't succeed.
     """
     return bool(r(['git', 'pull', '--ff-only']))
+
+def diff(*paths):
+    if not paths:
+        paths = ['.']
+    return r(['git', 'diff'] + paths)
