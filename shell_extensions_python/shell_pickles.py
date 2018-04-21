@@ -3,6 +3,7 @@ A module containing functions that load and save pickle files automatically.
 """
 
 import pickle
+from .shell_types import ShellBool
 
 def ploads(filename, limit=float('inf')):
     """
@@ -38,9 +39,10 @@ def psaves(filename, pickles):
     with open(filename, 'wb') as f:
         for pick in pickles:
             pickle.dump(pick, f)
+    return ShellBool.true
 
 def psave(filename, pickl):
     """
     Save a single pickle to a file
     """
-    psaves(filename, [pickl])
+    return psaves(filename, [pickl])

@@ -11,7 +11,7 @@ import getpass
 
 import glob as pyglob
 
-from .shell_types import ShellStr, ShellList
+from .shell_types import ShellStr, ShellList, ShellBool
 from .path_manipulation import expand_user
 from .interactive import Interactive, DisplayPath
 
@@ -55,6 +55,7 @@ def write(filename, contents, clobber=False, append=False):
         mode = 'x'
     with open(filename, mode) as f:
         f.write(contents)
+    return ShellBool.true
 
 def pwd():
     """
@@ -77,21 +78,26 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
     path = expand_user(path)
     if not os.path.exists(path):
         if ignore_missing:
-            return
+            return ShellBool.true
         else:
             raise FileNotFoundError("The file %s cannot be removed as it does not exist" % path)
     elif os.path.isdir(path):
         if ls(path) == []:
             os.rmdir(path)
+            return ShellBool.true
         elif recursively:
             shutil.rmtree(path)
+            return ShellBool.true
         elif interactive:
             if Interactive.ask_question("Are you sure you want to remove %s: it is a directory with contents [yN]: " % path) == 'y':
                 shutil.rmtree(path)
+                return ShellBool.true
+            return ShellBool.false
         else:
             raise CannotRemoveDirectoryError(path)
     elif os.path.isfile(path):
         os.remove(path)
+        return ShellBool.true
     else:
         raise RuntimeError("The path %s represents an existing file that is not a directory or normal file" % path)
 
@@ -123,6 +129,7 @@ def cd(path='~'):
         os.chdir(path)
         cd.stack.append(path)
         assert(path == pwd()), "cd failed"
+        return ShellBool.true
     elif isinstance(path, int):
         if path < 1:
             raise RuntimeError("path should be a number > 1")
@@ -130,6 +137,7 @@ def cd(path='~'):
         path_str = cd.stack[path]
         cd.stack = cd.stack[:path]
         cd(path_str)
+        return ShellBool.true
     else:
         raise TypeError("path should either be int or str but was %s" % type(path))
 

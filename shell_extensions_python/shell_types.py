@@ -5,6 +5,8 @@ Basic shell types
 import os
 import os.path
 
+from enum import Enum
+
 class ShellStr(str):
     """
     A wrapper around str with a few additional properties
@@ -34,3 +36,11 @@ class ShellList(list):
         Converts to a single file with the given unlines
         """
         return ShellStr(os.linesep.join(self) + os.linesep)
+
+class ShellBool(Enum):
+    true = True
+    false = False
+    def __bool__(self):
+        return self.value
+    def __repr__(self):
+        return ""
