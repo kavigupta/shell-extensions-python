@@ -58,7 +58,6 @@ class TestLs(unittest.TestCase):
     @reset
     def test_empty_ls(self):
         self.assertEqual(ls(), [])
-
     @reset
     def test_full_path_ls(self):
         mkdir('path/to')
@@ -70,7 +69,6 @@ class TestLs(unittest.TestCase):
         self.assertEqual(ls('..', full=True), ['../path'])
         cd('..')
         rm('path', recursively=True)
-
     @reset
     def test_all_ls(self):
         write("shown", '')
@@ -79,7 +77,6 @@ class TestLs(unittest.TestCase):
         self.assertEqual(ls(a=False), ["shown"])
         rm("shown")
         rm(".hidden")
-
     @reset
     def test_sorted_ls(self):
         paths = [hex(randint(0, 0x10000000000)) for _ in range(50)]
@@ -96,7 +93,6 @@ class TestWrite(unittest.TestCase):
         self.assertEqual(ls(), ['test.py'])
         self.assertEqual(cat('test.py'), 'hi!!!')
         rm('test.py')
-
     @reset
     def test_write_options(self):
         write('test', 'first line\n')
@@ -114,7 +110,6 @@ class TestRm(unittest.TestCase):
     def test_rm_dne(self):
         self.assertRaises(FileNotFoundError, lambda: rm('does-not-exist'))
         rm('does-not-exist', ignore_missing=True)
-
     @reset
     def test_rmdir(self):
         mkdir('empty-folder')
