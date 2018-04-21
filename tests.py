@@ -4,7 +4,7 @@ from os import system
 import unittest
 from random import randint
 
-from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave, r
+from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave, r, CannotRemoveDirectoryError
 
 INITIAL_PWD = join(pwd(), 'tests')
 def reset(fn):
@@ -50,7 +50,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(join(INITIAL_PWD, 'path'), pwd())
         cd(INITIAL_PWD)
         self.assertEqual(cat('path/to/folder/file.txt'), "hello")
-        rm('path', remove_recursively=True)
+        rm('path', recursively=True)
 
     @reset
     def test_empty_ls(self):
@@ -66,7 +66,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(ls('..'), ['path'])
         self.assertEqual(ls('..', full=True), ['../path'])
         cd('..')
-        rm('path', remove_recursively=True)
+        rm('path', recursively=True)
 
     @reset
     def test_all_ls(self):
