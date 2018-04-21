@@ -62,6 +62,10 @@ def pwd():
     """
     return ShellStr(os.getcwd())
 
+class CannotRemoveDirectoryError(OSError):
+    def __init__(self, path):
+        super().__init__("Cannot remove directory %s, it has contents" % path)
+
 def rm(path, ignore_missing=False, recursively=False, interactive=True):
     """
     Removes the given normal file or empty folder.
@@ -75,7 +79,7 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
         if ignore_missing:
             return
         else:
-            raise RuntimeError("The file %s cannot be removed as it does not exist" % path)
+            raise FileNotFoundError("The file %s cannot be removed as it does not exist" % path)
     elif os.path.isdir(path):
         if ls(path) == []:
             os.rmdir(path)
@@ -85,7 +89,7 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
             if ask_question("Are you sure you want to remove %s: it is a directory with contents [yN]: " % path) == 'y':
                 shutil.rmtree(path)
         else:
-            raise RuntimeError("Cannot remove directory %s, it has contents" % path)
+            raise CannotRemoveDirectoryError(path)
     elif os.path.isfile(path):
         os.remove(path)
     else:
