@@ -6,12 +6,14 @@ from random import randint
 
 from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave, r
 
-system('rm -r tests')
-mkdir('tests')
 INITIAL_PWD = join(pwd(), 'tests')
 def reset(fn):
     def modified(self, *args):
         cd(INITIAL_PWD)
+        cd('..')
+        system('rm -r tests')
+        mkdir('tests')
+        cd('tests')
         fn(self, *args)
         self.assertEqual(INITIAL_PWD, pwd())
         self.assertEqual(ls(), [])
