@@ -30,7 +30,7 @@ class ShellResult:
     def __init__(self, completed_process):
         self.completed_process = completed_process
     def __bool__(self):
-        return self.completed_process == 0
+        return self.completed_process.returncode == 0
     @staticmethod
     def _process(raw, single_line, as_lines):
         result = raw.decode('utf-8')
