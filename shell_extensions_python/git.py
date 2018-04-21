@@ -76,9 +76,7 @@ def commits_wrt_tracking():
     Get the number of commits off from the tracking branch (ahead, behind)
     """
     result = r(('git', 'rev-list', '--left-right', '--count', \
-                        current_branch() + "..." + tracking_branch()), std=True, err=True)
-    if result.returncode != 0:
-        return
+                        current_branch() + "..." + tracking_branch()), std=True, err=True, throw=True)
     ahead, behind = result.stdout(single_line=True).split()
     return int(ahead), int(behind)
 
