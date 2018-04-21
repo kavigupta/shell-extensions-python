@@ -4,7 +4,7 @@ from os import system
 import unittest
 from random import randint
 
-from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave
+from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave, r
 
 system('rm -r tests')
 mkdir('tests')
@@ -90,12 +90,17 @@ class Tests(unittest.TestCase):
         self.assertEqual(ls(), ['test.py'])
         self.assertEqual(cat('test.py'), 'hi!!!')
         rm('test.py')
+
     @reset
     def test_pickle(self):
         psave('test.pkl', [1, 2, 3])
         self.assertEqual(pload('test.pkl'), [1, 2, 3])
         rm('test.pkl')
 
+    @reset
+    def test_exit_code(self):
+        self.assertEqual(True, bool(r('true')))
+        self.assertEqual(False, bool(r('false')))
 
 if __name__ == '__main__':
     unittest.main()
