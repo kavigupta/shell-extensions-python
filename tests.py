@@ -130,6 +130,11 @@ class Tests(unittest.TestCase):
         write('path/file', '')
         Interactive.ask_question = lambda _: "n"
         rm('path')
+        self.assertEqual(['path'], ls())
+        Interactive.ask_question = lambda _: "y"
+        rm("path")
+        self.assertEqual([], ls())
+
     @reset
     def test_pickle(self):
         psave('test.pkl', [1, 2, 3])
