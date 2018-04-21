@@ -163,6 +163,10 @@ class TestRun(unittest.TestCase):
     def test_exit_code(self):
         self.assertEqual(True, bool(r('true')))
         self.assertEqual(False, bool(r('false')))
+    @reset
+    def test_return_value(self):
+        self.assertEqual("", repr(r('true')))
+
 
 class TestCp(unittest.TestCase):
     @reset
