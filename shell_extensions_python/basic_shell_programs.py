@@ -13,7 +13,7 @@ import glob as pyglob
 
 from .shell_types import ShellStr, ShellList
 from .path_manipulation import expand_user
-from .interactive import ask_question, DisplayPath
+from .interactive import Interactive, DisplayPath
 
 def ls(path='.', sort_key=lambda x: x, a=True, full=False):
     """
@@ -86,7 +86,7 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
         elif recursively:
             shutil.rmtree(path)
         elif interactive:
-            if ask_question("Are you sure you want to remove %s: it is a directory with contents [yN]: " % path) == 'y':
+            if Interactive.ask_question("Are you sure you want to remove %s: it is a directory with contents [yN]: " % path) == 'y':
                 shutil.rmtree(path)
         else:
             raise CannotRemoveDirectoryError(path)

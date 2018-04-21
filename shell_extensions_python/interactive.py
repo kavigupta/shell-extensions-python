@@ -7,11 +7,11 @@ import os
 from enum import Enum
 from colorama import Fore, Style
 
-def ask_question(prompt):
+class Interactive:
     """
     Ask the user a question
     """
-    return input(prompt)
+    ask_question = input
 
 class FileType(Enum):
     """
