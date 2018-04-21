@@ -62,12 +62,12 @@ def pwd():
     """
     return ShellStr(os.getcwd())
 
-def rm(path, ignore_missing=False, remove_recursively=False, interactive=True):
+def rm(path, ignore_missing=False, recursively=False, interactive=True):
     """
     Removes the given normal file or empty folder.
 
     ignore_missing: do not error if the file does not exist
-    remove_recursively: remove a directory recursively if it contains values
+    recursively: remove a directory recursively if it contains values
     interactive: prompt rather than erroring if you encounter a file you are not allowed to delete
     """
     path = expand_user(path)
@@ -79,7 +79,7 @@ def rm(path, ignore_missing=False, remove_recursively=False, interactive=True):
     elif os.path.isdir(path):
         if ls(path) == []:
             os.rmdir(path)
-        elif remove_recursively:
+        elif recursively:
             shutil.rmtree(path)
         elif interactive:
             if ask_question("Are you sure you want to remove %s: it is a directory with contents [yN]: " % path) == 'y':
