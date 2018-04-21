@@ -17,3 +17,11 @@ It provides a number of commands.
  - `whoami()`: returns the current user
  - `less(file)`: opens the current file using the system's `ls`
  - `cp(src, dest)`: copies the given file from the source to the destination location
+
+## Running external programs
+
+The basic functions for running external programs is `r`. You can call it in one of two ways, either run it as `r('grep -R hi .')` which results in the string being run with command interpolation, or `r(('grep', '-R', 'hi', '.'))`, which is execve-style.
+
+By default, the standard out and error are printed to the terminal. You can capture them by setting `std=True`, `err=True`. Additionally, you can turn a failure return code (something other than 0) into an error by setting `throw=True`.
+
+The return value of the `r` function is a `ShellResult` which can be treated like a boolean value as such: `r('make') and r('make check')`. It also can be queried for the stdout/stderr as such: `r('make').stdout()` or `r('make').stderr()`. Each of these functions can take in a `single_line` parameter, which would provide you with a single line, stripped of newlines. Each of these functions can also take in a `as_lines` which then returns a list of lines instead of a single line.
