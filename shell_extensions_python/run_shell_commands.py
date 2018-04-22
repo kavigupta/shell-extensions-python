@@ -43,6 +43,8 @@ class ShellResult:
             result = lines[0]
         elif as_lines:
             result = result.split(os.linesep)
+            if result[-1] == "":
+                result.pop()
         return result
     def stdout(self, single_line=False, as_lines=False):
         """

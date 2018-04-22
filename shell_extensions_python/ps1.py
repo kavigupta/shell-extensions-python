@@ -60,7 +60,7 @@ class GitPathRenderer(Renderer):
             above, repo = GitPathRenderer.current_repository_split()
             local = git.relative_path_in_repository()
             return self.outside_color + above + self.repo_color + repo + self.local_color + local + reset
-        except ProcessFailedException:
+        except git.NoRepositoryError:
             return self.outside_color + pwd() + reset
 
 class GitStatusRenderer(Renderer):
@@ -121,7 +121,7 @@ class GitStatusRenderer(Renderer):
     def render(self):
         try:
             return self.render_branch() + self.git_offsets() + self.one_line_status()
-        except ProcessFailedException:
+        except git.NoRepositoryError:
             return ""
 
 class UserRenderer(Renderer):
