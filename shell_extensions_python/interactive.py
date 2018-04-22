@@ -57,6 +57,5 @@ def modified_displayhook(value, original_displayhook=sys.displayhook):
     Make sure that ShellBool results in no value
     """
     if isinstance(value, ShellBool):
-        return
-    else:
-        return original_displayhook
+        return None
+    return original_displayhook(value)
