@@ -53,6 +53,9 @@ class DisplayPath(str):
         return self.type.value + super().__repr__() + Style.RESET_ALL
 
 def modified_displayhook(value, original_displayhook=sys.displayhook):
+    """
+    Make sure that ShellBool results in no value
+    """
     if isinstance(value, ShellBool):
         return
     else:

@@ -15,7 +15,6 @@ from .colors import reset
 
 
 from .basic_shell_programs import pwd, whoami
-from .run_shell_commands import ProcessFailedException
 
 from .path_manipulation import unexpand_user, basename, dirname
 

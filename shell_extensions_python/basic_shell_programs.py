@@ -64,6 +64,9 @@ def pwd():
     return ShellStr(os.getcwd())
 
 class CannotRemoveDirectoryError(OSError):
+    """
+    Represents an error involving incorrectly removing a directory
+    """
     def __init__(self, path):
         super().__init__("Cannot remove directory %s, it has contents" % path)
 
@@ -89,7 +92,8 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
             shutil.rmtree(path)
             return ShellBool.true
         elif interactive:
-            if Interactive.ask_question("Are you sure you want to remove %s: it is a directory with contents [yN]: " % path) == 'y':
+            if Interactive.ask_question("Are you sure you want to remove %s:" \
+                    + " it is a directory with contents [yN]: " % path) == 'y':
                 shutil.rmtree(path)
                 return ShellBool.true
             return ShellBool.false

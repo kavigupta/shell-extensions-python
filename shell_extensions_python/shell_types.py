@@ -38,6 +38,9 @@ class ShellList(list):
         return ShellStr(os.linesep.join(self) + os.linesep)
 
 class ShellBool(Enum):
+    """
+    Represents a boolean value that doesn't get printed out.
+    """
     true = True
     false = False
     def __bool__(self):

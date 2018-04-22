@@ -54,6 +54,9 @@ def current_branch():
     return result.stdout(single_line=True)
 
 class NoTrackingBranchError(OSError):
+    """
+    An error representing that there's no tracking branch
+    """
     pass
 
 @check_in_repository
@@ -192,6 +195,9 @@ def pull_ff():
     return bool(r(['git', 'pull', '--ff-only']))
 
 def diff(*paths):
+    """
+    Calls diff on the given paths.
+    """
     if not paths:
         paths = ['.']
     return r(['git', 'diff'] + paths)
