@@ -1,9 +1,12 @@
 # pylint: disable-all
 
+import sys
+
 from .__init__ import *
 
 from .ps1 import SeriesRenderer, UserRenderer, GitPathRenderer, GitStatusRenderer
 from .colors import *
+from .interactive import modified_displayhook
 
 SeriesRenderer(
     UserRenderer(user_color=yellow_bright),
@@ -17,3 +20,5 @@ SeriesRenderer(
 from colorama import init
 init()
 del init
+
+sys.displayhook = modified_displayhook

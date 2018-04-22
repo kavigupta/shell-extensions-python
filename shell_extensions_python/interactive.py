@@ -4,8 +4,11 @@ Contains functions relevant to user interaction.
 
 
 import os
+import sys
 from enum import Enum
 from colorama import Fore, Style
+
+from .shell_types import ShellBool
 
 class Interactive:
     """
@@ -48,3 +51,9 @@ class DisplayPath(str):
         return result
     def __repr__(self):
         return self.type.value + super().__repr__() + Style.RESET_ALL
+
+def modified_displayhook(value, original_displayhook=sys.displayhook):
+    if isinstance(value, ShellBool):
+        return
+    else:
+        return original_displayhook
