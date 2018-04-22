@@ -53,6 +53,9 @@ def current_branch():
     result = r(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), std=True, err=True, throw=True)
     return result.stdout(single_line=True)
 
+class NoTrackingBranchError(OSError):
+    pass
+
 @check_in_repository
 def tracking_branch():
     """
@@ -61,7 +64,11 @@ def tracking_branch():
     symbolic = r(('git', 'symbolic-ref', '-q', 'HEAD'), std=True, err=True, throw=True)
     current_symbol_ref = symbolic.stdout(single_line=True)
     upstream = r((('git', 'for-each-ref', "--format=%(upstream:short)", current_symbol_ref)), std=True, err=True)
-    return upstream.stdout(single_line=True)
+    output = upstream.stdout(as_lines=True)
+    assert len(output) <= 1, str(output)
+    if not output:
+        raise NoTrackingBranchError
+    return output[0]
 
 @check_in_repository
 def set_tracking_branch(to_track):
@@ -75,10 +82,13 @@ def commits_wrt_tracking():
     """
     Get the number of commits off from the tracking branch (ahead, behind)
     """
-    result = r(('git', 'rev-list', '--left-right', '--count', \
-                        current_branch() + "..." + tracking_branch()), std=True, err=True, throw=True)
-    ahead, behind = result.stdout(single_line=True).split()
-    return int(ahead), int(behind)
+    try:
+        result = r(('git', 'rev-list', '--left-right', '--count', \
+                            current_branch() + "..." + tracking_branch()), std=True, err=True, throw=True)
+        ahead, behind = result.stdout(single_line=True).split()
+        return int(ahead), int(behind)
+    except NoTrackingBranchError:
+        return 0, 0
 
 @check_in_repository
 def status():
