@@ -11,7 +11,7 @@ from collections import Counter
 import shell_extensions_python.git as git
 from .git import GitStatusCategory
 
-from .colors import reset
+from .colors import PS1Colors
 
 
 from .basic_shell_programs import pwd, whoami
@@ -58,9 +58,9 @@ class GitPathRenderer(Renderer):
         try:
             above, repo = GitPathRenderer.current_repository_split()
             local = git.relative_path_in_repository()
-            return self.outside_color + above + self.repo_color + repo + self.local_color + local + reset
+            return self.outside_color + above + self.repo_color + repo + self.local_color + local + PS1Colors.reset
         except git.NoRepositoryError:
-            return self.outside_color + pwd() + reset
+            return self.outside_color + pwd() + PS1Colors.reset
 
 class GitStatusRenderer(Renderer):
     """
@@ -81,7 +81,7 @@ class GitStatusRenderer(Renderer):
         Render the current branch
         """
         branch = git.current_branch()
-        return self.branch_color + branch + reset
+        return self.branch_color + branch + PS1Colors.reset
     def git_offsets(self):
         """
         Render the offsets with respect to the tracking branch
@@ -95,7 +95,7 @@ class GitStatusRenderer(Renderer):
         result = ", ".join(newoffs)
         if result == "":
             return ""
-        return reset + " [" + result + reset + "]"
+        return PS1Colors.reset + " [" + result + PS1Colors.reset + "]"
     def process_status(self, prefix, count):
         """
         Colors the given status and count, and places an @ in between
@@ -105,9 +105,9 @@ class GitStatusRenderer(Renderer):
             GitStatusCategory.added : self.new,
             GitStatusCategory.deleted : self.deleted,
             GitStatusCategory.staged : self.staged,
-            GitStatusCategory.other : reset
+            GitStatusCategory.other : PS1Colors.reset
         }[prefix.category()]
-        return item_color + prefix.status_str() + "@" + str(count) + reset
+        return item_color + prefix.status_str() + "@" + str(count) + PS1Colors.reset
     def one_line_status(self):
         """
         Prints out a one-line representation of the status of the git repository
@@ -116,7 +116,7 @@ class GitStatusRenderer(Renderer):
         summary = " ".join(self.process_status(prefix, count) for prefix, count in prefixes)
         if not summary:
             return ""
-        return reset + " <" + summary + reset + ">"
+        return PS1Colors.reset + " <" + summary + PS1Colors.reset + ">"
     def render(self):
         try:
             return self.render_branch() + self.git_offsets() + self.one_line_status()
@@ -130,7 +130,7 @@ class UserRenderer(Renderer):
     def __init__(self, user_color):
         self.user_color = user_color
     def render(self):
-        return self.user_color + whoami() + reset
+        return self.user_color + whoami() + PS1Colors.reset
 
 class ConstRenderer(Renderer):
     """

@@ -16,11 +16,25 @@ def wrap(color_seq):
     """
     return "\001%s\002" % color_seq
 
-yellow_bright = wrap(Style.BRIGHT + Fore.YELLOW)
-orange = path_color = wrap(Fore.YELLOW if windows else "\x1b[38;5;214m")
-green_bright = wrap(Style.BRIGHT + Fore.GREEN if windows else  "\x1b[38;5;82m")
-red = wrap(Fore.RED)
-blue = wrap(Fore.BLUE)
-green = wrap(Fore.GREEN if windows else "\x1b[38;5;28m")
-cyan = wrap(Fore.BLUE if windows else "\x1b[38;5;38m")
-reset = wrap(Style.RESET_ALL)
+class PrintColors:
+    """
+    Colors to be printed to the terminal
+    """
+    yellow_bright = Style.BRIGHT + Fore.YELLOW
+    orange = path_color = Fore.YELLOW if windows else "\x1b[38;5;214m"
+    green_bright = Style.BRIGHT + Fore.GREEN if windows else  "\x1b[38;5;82m"
+    red = Fore.RED
+    red_bright = Style.BRIGHT + Fore.RED
+    blue = Fore.BLUE
+    green = Fore.GREEN if windows else "\x1b[38;5;28m"
+    cyan = Fore.BLUE if windows else "\x1b[38;5;38m"
+    reset = Style.RESET_ALL
+
+class PS1Colors:
+    """
+    Colors to be printed for the PS1.
+    """
+    def __getattr__(self, attr):
+        return wrap(getattr(PrintColors, attr))
+
+PS1Colors = PS1Colors()
