@@ -2,9 +2,13 @@
 Various functions to help run shell commands.
 """
 
+from abc import ABCMeta, abstractmethod
+from enum import Enum
+
 import subprocess
 import os
 
+from .colors import PrintColors
 from .path_manipulation import expand_user
 
 def iterable(value):
@@ -27,10 +31,12 @@ class ShellResult:
     """
     Represents the result of calling a shell program
     """
-    def __init__(self, completed_process):
-        self.completed_process = completed_process
+    def __init__(self, stdout, stderr, returncode):
+        self._stdout = stdout
+        self._stderr = stderr
+        self.returncode = returncode
     def __bool__(self):
-        return self.completed_process.returncode == 0
+        return self.returncode == 0
     def __repr__(self):
         return ""
     @staticmethod
@@ -52,9 +58,100 @@ class ShellResult:
             single_line: strip away all leading and trailing whitespace, and error if there is more than one line
             as_lines: return a list of lines.
         """
-        return self._process(self.completed_process.stdout, single_line=single_line, as_lines=as_lines)
+        return self._process(self._stdout, single_line=single_line, as_lines=as_lines)
 
-def r(command, std=False, err=False, throw=False):
+class FD(Enum):
+    """
+    File descriptors, either stdout or stderr
+    """
+    stdout = 1
+    stderr = 2
+
+class Buffer(metaclass=ABCMeta):
+    """
+    Represents a buffer with the operations of new_data append, and getting all the contents
+    """
+    @abstractmethod
+    def new_data(self, contents):
+        """
+        Append new data
+        """
+        pass
+    @abstractmethod
+    def contents(self):
+        """
+        Get all the contents
+        """
+        pass
+    @staticmethod
+    def create(collect):
+        """
+        Either return a collecting or ignoring buffer
+        """
+        if collect:
+            return CollectionBuffer()
+        return IgnoringBuffer()
+
+class CollectionBuffer(Buffer):
+    """
+    A buffer which tracks its contents
+    """
+    def __init__(self):
+        self.__buf = []
+    def new_data(self, contents):
+        self.__buf.append(contents)
+    def contents(self):
+        return b"".join(self.__buf)
+
+class IgnoringBuffer(Buffer):
+    """
+    A buffer which ignores its contents
+    """
+    def new_data(self, contents):
+        pass
+    def contents(self):
+        return b""
+
+
+class LineCallback(metaclass=ABCMeta):
+    """
+    Represents a callback that is executed on every prodcued line, either stdout or stderr.
+    """
+    @abstractmethod
+    def callback(self, fd, contents):
+        """
+        A line was just produced on descriptor `fd` with value `contents`
+        """
+        pass
+
+class DoNothingCallback(LineCallback):
+    """
+    A callback that does nothing
+    """
+    def callback(self, fd, contents):
+        pass
+
+class PrintCallback(LineCallback):
+    """
+    A callback that prints its output, default behavior for running processes
+    """
+    def callback(self, fd, contents):
+        print(contents.decode("utf-8"), end="")
+
+class ColorPrintCallback(LineCallback):
+    """
+    A callback that prints its output, with stderr appearing in red, Eclipse-style
+    """
+    def callback(self, fd, contents):
+        print(self.start_color(fd) + contents.decode("utf-8") + PrintColors.reset, end="")
+    @staticmethod
+    def start_color(fd):
+        """
+        The color to use for the given file descriptor
+        """
+        return {FD.stdout : PrintColors.reset, FD.stderr : PrintColors.red}[fd]
+
+def r(command, std=False, err=False, throw=False, callback=None):
     """
     Run the given command, and optionally gather the stdout and stderr
 
@@ -64,21 +161,32 @@ def r(command, std=False, err=False, throw=False):
     """
     if throw is True:
         throw = ProcessFailedException
-    std_proc = subprocess.PIPE if std else None
-    err_proc = subprocess.PIPE if err else None
+    stdout_buf = Buffer.create(std)
+    stderr_buf = Buffer.create(err)
+    if callback is None:
+        callback = DoNothingCallback() if std or err else ColorPrintCallback()
     if isinstance(command, str):
-        result = subprocess.run(command, shell=True, stdout=std_proc, stderr=err_proc)
+        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     elif iterable(command):
         command = list(command)
         if all(isinstance(x, str) for x in command):
-            result = subprocess.run(command, stdout=std_proc, stderr=err_proc)
+            proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             raise RuntimeError("Cannot run %s: it has non-string elements" % command)
     else:
         raise RuntimeError("Expected str or some iterable, but got %s" % type(command))
-    if result.returncode != 0 and throw:
-        raise throw("Bad exit code: %s" % result.returncode)
-    return ShellResult(result)
+    for line in proc.stdout:
+        stdout_buf.new_data(line)
+        callback.callback(FD.stdout, line)
+    for line in proc.stderr:
+        stderr_buf.new_data(line)
+        callback.callback(FD.stderr, line)
+    exitcode = proc.wait()
+    proc.stdout.close()
+    proc.stderr.close()
+    if exitcode != 0 and throw:
+        raise throw("Bad exit code: %s" % exitcode)
+    return ShellResult(stdout_buf.contents(), stderr_buf.contents(), exitcode)
 
 def less(path):
     """
