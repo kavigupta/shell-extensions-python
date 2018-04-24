@@ -9,6 +9,7 @@ from enum import Enum
 from colorama import Fore, Style
 
 from .shell_types import ShellBool
+from .run_shell_commands import ShellResult
 
 class Interactive:
     """
@@ -56,6 +57,6 @@ def modified_displayhook(value, original_displayhook=sys.displayhook):
     """
     Make sure that ShellBool results in no value
     """
-    if isinstance(value, ShellBool):
+    if isinstance(value, ShellBool) or isinstance(value, ShellResult):
         return None
     return original_displayhook(value)
