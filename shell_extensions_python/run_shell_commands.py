@@ -7,6 +7,7 @@ from enum import Enum
 
 import subprocess
 import os
+from threading import Thread
 
 from .colors import PrintColors
 from .path_manipulation import expand_user
@@ -175,12 +176,21 @@ def r(command, std=False, err=False, throw=False, callback=None):
             raise RuntimeError("Cannot run %s: it has non-string elements" % command)
     else:
         raise RuntimeError("Expected str or some iterable, but got %s" % type(command))
-    for line in proc.stdout:
-        stdout_buf.new_data(line)
-        callback.callback(FD.stdout, line)
-    for line in proc.stderr:
-        stderr_buf.new_data(line)
-        callback.callback(FD.stderr, line)
+    def stdout_thread():
+        for line in proc.stdout:
+            stdout_buf.new_data(line)
+            callback.callback(FD.stdout, line)
+    stdout_thread = Thread(target=stdout_thread)
+    def stderr_thread():
+        for line in proc.stderr:
+            stderr_buf.new_data(line)
+            callback.callback(FD.stderr, line)
+    stderr_thread = Thread(target=stderr_thread)
+    stdout_thread.start()
+    stderr_thread.start()
+    stdout_thread.join()
+    stderr_thread.join()
+
     exitcode = proc.wait()
     proc.stdout.close()
     proc.stderr.close()

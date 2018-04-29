@@ -7,8 +7,8 @@ from random import randint
 from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave, r, CannotRemoveDirectoryError
 
 from shell_extensions_python.shell_types import ShellBool
-
 from shell_extensions_python.interactive import Interactive
+from shell_extensions_python.run_shell_commands import LineCallback, FD
 
 INITIAL_PWD = join(pwd(), 'tests')
 def reset(fn):
@@ -145,6 +145,12 @@ class TestRm(unittest.TestCase):
         self.assertEqual(ShellBool.true, rm("path"))
         self.assertEqual([], ls())
 
+class MockCallback(LineCallback):
+    def __init__(self):
+        self.contents = []
+    def callback(self, fd, contents):
+        self.contents.append((fd, contents))
+
 class TestPickle(unittest.TestCase):
     @reset
     def test_pickle(self):
@@ -166,6 +172,11 @@ class TestRun(unittest.TestCase):
     @reset
     def test_return_value(self):
         self.assertEqual("", repr(r('true')))
+    @reset
+    def test_callback_order(self):
+        mock = MockCallback()
+        r('echo abc >&2; sleep 0.1; echo def', callback=mock)
+        self.assertEqual([(FD.stderr, b'abc\n'), (FD.stdout, b'def\n')], mock.contents)
 
 
 class TestCp(unittest.TestCase):
