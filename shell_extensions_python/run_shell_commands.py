@@ -177,11 +177,13 @@ def r(command, std=False, err=False, throw=False, callback=None):
     else:
         raise RuntimeError("Expected str or some iterable, but got %s" % type(command))
     def stdout_thread():
+        "A thread for stdout"
         for line in proc.stdout:
             stdout_buf.new_data(line)
             callback.callback(FD.stdout, line)
     stdout_thread = Thread(target=stdout_thread)
     def stderr_thread():
+        "A thread for stderr"
         for line in proc.stderr:
             stderr_buf.new_data(line)
             callback.callback(FD.stderr, line)
