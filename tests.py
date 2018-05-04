@@ -3,8 +3,11 @@ from os.path import expanduser, join
 from os import system
 import unittest
 from random import randint
+from time import sleep
 
 from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, pload, psave, r, CannotRemoveDirectoryError
+
+from shell_extensions_python.tcombinator import TCombinator
 
 from shell_extensions_python.shell_types import ShellBool
 from shell_extensions_python.interactive import Interactive
@@ -183,6 +186,22 @@ class TestCp(unittest.TestCase):
     @reset
     def test_cp(self):
         self.fail("This is not covered")
+
+class TestTCombinator(unittest.TestCase):
+    def test_temporal_zip(self):
+        def generator1():
+            sleep(0.1)
+            yield 1
+            sleep(0.2)
+            yield 3
+            sleep(0.2)
+            yield 5
+        def generator2():
+            sleep(0.2)
+            yield 2
+            sleep(0.2)
+            yield 4
+        self.assertEqual([1, 2, 3, 4, 5], list(TemporalZip(generator1(), generator2())))
 
 if __name__ == '__main__':
     unittest.main()
