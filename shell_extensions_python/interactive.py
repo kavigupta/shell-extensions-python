@@ -8,8 +8,8 @@ import sys
 from enum import Enum
 from colorama import Fore, Style
 
-from .shell_types import ShellBool
 from .run_shell_commands import ShellResult
+from .shell_types import ShellBool
 
 class Interactive:
     """
@@ -53,10 +53,18 @@ class DisplayPath(str):
     def __repr__(self):
         return self.type.value + super().__repr__() + Style.RESET_ALL
 
+def is_displayed(value):
+    """
+    Whether or not the given value should be displayed on the screen
+    """
+    return not isinstance(value, (ShellBool, ShellResult))
+
 def modified_displayhook(value, original_displayhook=sys.displayhook):
     """
     Make sure that ShellBool results in no value
     """
-    if isinstance(value, (ShellBool, ShellResult)):
+    if not is_displayed(value):
         return None
+    if hasattr(value, '__repr_proxy__'):
+        return modified_displayhook(value.__repr_proxy__())
     return original_displayhook(value)
