@@ -201,7 +201,7 @@ class TestTCombinator(unittest.TestCase):
             yield 2
             sleep(0.2)
             yield 4
-        self.assertEqual([1, 2, 3, 4, 5], list(TemporalZip(generator1(), generator2())))
+        self.assertEqual([1, 2, 3, 4, 5], list(TCombinator(generator1(), generator2())))
 
 if __name__ == '__main__':
     unittest.main()
