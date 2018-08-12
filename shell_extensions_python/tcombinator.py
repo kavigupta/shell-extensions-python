@@ -11,6 +11,12 @@ class SIGSEGV:
     pass
 SIGSEGV = SIGSEGV()
 
+class EOF:
+    """
+    Represents the end of a file
+    """
+EOF = EOF()
+
 class TCombinator:
     """
     Takes in any number of asynchronous generators and is an iterable that produces a value
@@ -22,8 +28,7 @@ class TCombinator:
         self.buffer = SIGSEGV
         self.spaces_available = Semaphore(1)
         self.items_present = Semaphore(0)
-        self.thread_done_lock = Lock()
-        self.threads_remaining = len(generators)
+        self.n_threads = len(generators)
         for generator in generators:
             thread = Thread(target=self._thread, args=[generator])
             thread.start()
@@ -32,20 +37,28 @@ class TCombinator:
         """
         A thread that consumes the given generator and pushes each value onto the stack
         """
-        for item in generator:
+        while True:
+            try:
+                item = next(generator)
+            except StopIteration:
+                item = EOF
             self.spaces_available.acquire()
             self.buffer = item
             self.items_present.release()
-        with self.thread_done_lock:
-            self.threads_remaining -= 1
+            if item == EOF:
+                break
 
     def __iter__(self):
+        threads_remaining = self.n_threads
         while True:
-            with self.thread_done_lock:
-                if self.threads_remaining == 0:
-                    break
             self.items_present.acquire()
-            assert self.buffer is not SIGSEGV
-            yield self.buffer
-            self.buffer = SIGSEGV
+            item = self.buffer
+            assert item is not SIGSEGV
+            if item != EOF:
+                yield self.buffer
+                self.buffer = SIGSEGV
+            else:
+                threads_remaining -= 1
             self.spaces_available.release()
+            if threads_remaining == 0:
+                break
