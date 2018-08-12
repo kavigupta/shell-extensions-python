@@ -134,6 +134,8 @@ class Process:
         for fd, line in self:
             consumer.consume(fd, line)
         return ShellResult(consumer.stdout(), consumer.stderr(), self.exitcode)
+    def __gt__(self, other):
+        return self.collect(other)
 
 class Consumer(metaclass=ABCMeta):
     """
