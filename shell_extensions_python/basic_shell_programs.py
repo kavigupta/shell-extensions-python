@@ -11,10 +11,12 @@ import getpass
 
 import glob as pyglob
 
+from .autorun import autorun
 from .shell_types import ShellStr, ShellList, ShellBool
 from .path_manipulation import expand_user
 from .interactive import Interactive, DisplayPath
 
+@autorun
 def ls(path='.', sort_key=lambda x: x, a=True, full=False):
     """
     Returns a listing of the given path, sorted by name by default
@@ -57,6 +59,7 @@ def write(filename, contents, clobber=False, append=False):
         f.write(contents)
     return ShellBool.true
 
+@autorun
 def pwd():
     """
     Get the present working directory as a ShellStr
@@ -123,7 +126,7 @@ def mkdir(folder, error_if_exists=False):
             raise
     return True
 
-
+@autorun
 def cd(path='~'):
     """
     Change the current directory to the given one.
@@ -165,6 +168,7 @@ def glob(glob_str):
     else:
         return results[0]
 
+@autorun
 def whoami():
     """
     Get the current user
