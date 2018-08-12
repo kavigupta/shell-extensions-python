@@ -92,8 +92,8 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
             shutil.rmtree(path)
             return ShellBool.true
         elif interactive:
-            if Interactive.ask_question("Are you sure you want to remove %s:" \
-                    + " it is a directory with contents [yN]: " % path) == 'y':
+            if Interactive.ask_question(("Are you sure you want to remove %s:" \
+                    + " it is a directory with contents [yN]: ") % path) == 'y':
                 shutil.rmtree(path)
                 return ShellBool.true
             return ShellBool.false
