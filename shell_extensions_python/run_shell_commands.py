@@ -61,6 +61,20 @@ class ShellResult:
         """
         return self._process(self._stdout, single_line=single_line, as_lines=as_lines)
 
+    def or_throw(self, throw=True): # pylint: disable=R1710
+        """
+        Throws if throw is truthy, and the return code was failure.
+
+        You can set throw to be an exception to throw it
+        """
+        if self:
+            return self # not an error
+        if not throw:
+            return self
+        if throw is True:
+            raise ProcessFailedException
+        raise throw # pylint: disable=E0702
+
 class FD(Enum):
     """
     File descriptors, either stdout or stderr
