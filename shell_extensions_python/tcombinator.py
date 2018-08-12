@@ -2,7 +2,7 @@
 Provides TCombinator.
 """
 
-from threading import Semaphore, Lock, Thread
+from threading import Semaphore, Thread
 
 class SIGSEGV:
     """
