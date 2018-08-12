@@ -2,6 +2,8 @@
 A package that is supposed to allow you to use python rather than bash as your shell.
 """
 
+from sys import argv
+
 from . import git
 
 from .basic_shell_programs import ls, cat, pwd, cd, globs, glob, mkdir, write, rm, whoami, CannotRemoveDirectoryError
