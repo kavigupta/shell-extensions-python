@@ -129,7 +129,7 @@ def cd(path='~'):
     Change the current directory to the given one.
     """
     if isinstance(path, str):
-        path = os.path.abspath(expand_user(path))
+        path = os.path.realpath(expand_user(path))
         os.chdir(path)
         cd.stack.append(path)
         assert(path == pwd()), "cd failed"
