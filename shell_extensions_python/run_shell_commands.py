@@ -68,89 +68,8 @@ class FD(Enum):
     stdout = 1
     stderr = 2
 
-class Buffer(metaclass=ABCMeta):
-    """
-    Represents a buffer with the operations of new_data append, and getting all the contents
-    """
-    @abstractmethod
-    def new_data(self, contents):
-        """
-        Append new data
-        """
-        pass
-    @abstractmethod
-    def contents(self):
-        """
-        Get all the contents
-        """
-        pass
-    @staticmethod
-    def create(collect):
-        """
-        Either return a collecting or ignoring buffer
-        """
-        if collect:
-            return CollectionBuffer()
-        return IgnoringBuffer()
-
-class CollectionBuffer(Buffer):
-    """
-    A buffer which tracks its contents
-    """
-    def __init__(self):
-        self.__buf = []
-    def new_data(self, contents):
-        self.__buf.append(contents)
-    def contents(self):
-        return b"".join(self.__buf)
-
-class IgnoringBuffer(Buffer):
-    """
-    A buffer which ignores its contents
-    """
-    def new_data(self, contents):
-        pass
-    def contents(self):
-        return b""
 
 
-class LineCallback(metaclass=ABCMeta):
-    """
-    Represents a callback that is executed on every prodcued line, either stdout or stderr.
-    """
-    @abstractmethod
-    def callback(self, fd, contents):
-        """
-        A line was just produced on descriptor `fd` with value `contents`
-        """
-        pass
-
-class DoNothingCallback(LineCallback):
-    """
-    A callback that does nothing
-    """
-    def callback(self, fd, contents):
-        pass
-
-class PrintCallback(LineCallback):
-    """
-    A callback that prints its output, default behavior for running processes
-    """
-    def callback(self, fd, contents):
-        print(contents.decode("utf-8"), end="")
-
-class ColorPrintCallback(LineCallback):
-    """
-    A callback that prints its output, with stderr appearing in red, Eclipse-style
-    """
-    def callback(self, fd, contents):
-        print(self.start_color(fd) + contents.decode("utf-8") + PrintColors.reset, end="")
-    @staticmethod
-    def start_color(fd):
-        """
-        The color to use for the given file descriptor
-        """
-        return {FD.stdout : PrintColors.reset, FD.stderr : PrintColors.red}[fd]
 
 def r(command, std=False, err=False, throw=False, callback=None):
     """
