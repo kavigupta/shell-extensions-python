@@ -7,10 +7,10 @@ from enum import Enum
 
 import subprocess
 import os
-from threading import Thread
 
 from .colors import PrintColors
 from .path_manipulation import expand_user
+from .tcombinator import TCombinator
 
 def iterable(value):
     """
@@ -82,56 +82,126 @@ class FD(Enum):
     stdout = 1
     stderr = 2
 
-
-
-
-def r(command, std=False, err=False, throw=False, callback=None):
+def parse_command(command, print_direct):
     """
-    Run the given command, and optionally gather the stdout and stderr
-
-    If command is a string, run it as a shell command, if command is an iterable, run it as a execve command.
-
-    If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
+    Parses the given into a subprocess call.
     """
-    if throw is True:
-        throw = ProcessFailedException
-    stdout_buf = Buffer.create(std)
-    stderr_buf = Buffer.create(err)
-    if callback is None:
-        callback = DoNothingCallback() if std or err else ColorPrintCallback()
+    pipe = None if print_direct else subprocess.PIPE
     if isinstance(command, str):
-        proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return subprocess.Popen(command, shell=True, stdout=pipe, stderr=pipe)
     elif iterable(command):
         command = list(command)
         if all(isinstance(x, str) for x in command):
-            proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            return subprocess.Popen(command, stdout=pipe, stderr=pipe)
         else:
             raise RuntimeError("Cannot run %s: it has non-string elements" % command)
     else:
         raise RuntimeError("Expected str or some iterable, but got %s" % type(command))
-    def stdout_thread():
-        "A thread for stdout"
-        for line in proc.stdout:
-            stdout_buf.new_data(line)
-            callback.callback(FD.stdout, line)
-    stdout_thread = Thread(target=stdout_thread)
-    def stderr_thread():
-        "A thread for stderr"
-        for line in proc.stderr:
-            stderr_buf.new_data(line)
-            callback.callback(FD.stderr, line)
-    stderr_thread = Thread(target=stderr_thread)
-    stdout_thread.start()
-    stderr_thread.start()
-    stdout_thread.join()
-    stderr_thread.join()
 
-    exitcode = proc.wait()
-    proc.stdout.close()
-    proc.stderr.close()
-    if exitcode != 0 and throw:
-        raise throw("Bad exit code: %s" % exitcode)
-    return ShellResult(stdout_buf.contents(), stderr_buf.contents(), exitcode)
+class Process:
+    """
+    Represents a process, which can be iterated through and has several methods
+    """
+    def __init__(self, proc, print_direct):
+        self.proc = proc
+        self._exitcode = None
+        self.print_direct = print_direct
+    def __iter__(self):
+        if not self.print_direct:
+            yield from TCombinator(
+                ((FD.stdout, line) for line in self.proc.stdout),
+                ((FD.stderr, line) for line in self.proc.stderr)
+            )
+            self.proc.stdout.close()
+            self.proc.stderr.close()
+        self._exitcode = self.proc.wait()
+    @property
+    def exitcode(self):
+        """
+        Get the exit code for the underlying process. Throws an error if the process isn't complete
+        """
+        if self._exitcode is not None:
+            return self._exitcode
+        raise RuntimeError("No exit code for the current process")
+    def collect(self, consumer_type):
+        """
+        Runs the given shell consumer on the contents of this process, then returns the exit code
+        """
+        if consumer_type is None:
+            list(self)
+            return ShellResult(b"", b"", self.exitcode)
+        consumer = consumer_type()
+        for fd, line in self:
+            consumer.consume(fd, line)
+        return ShellResult(consumer.stdout(), consumer.stderr(), self.exitcode)
+
+class Consumer(metaclass=ABCMeta):
+    """
+    Represents a callback that can consume lines and optionally stores them
+    """
+    @abstractmethod
+    def consume(self, fd, line):
+        """
+        Consume the given line on the given descriptor
+        """
+    @abstractmethod
+    def stdout(self):
+        """
+        Returns the stdout seen
+        """
+    @abstractmethod
+    def stderr(self):
+        """
+        Returns the stderr seen
+        """
+
+class StderrRed(Consumer):
+    """
+    Prints standard out and standard error to the screen.
+    """
+    @staticmethod
+    def consume(fd, line):
+        if fd == FD.stdout:
+            print(line.decode('utf-8'), end="")
+        elif fd == FD.stderr:
+            print(PrintColors.red + line.decode('utf-8') + PrintColors.reset, end="")
+    @staticmethod
+    def stdout():
+        return b""
+    @staticmethod
+    def stderr():
+        return b""
+
+class Collect(Consumer):
+    """
+    Collects standard out and standard error in memory
+    """
+    def __init__(self):
+        self.stdouts = []
+        self.stderrs = []
+    def consume(self, fd, line):
+        {FD.stdout : self.stdouts, FD.stderr : self.stderrs}[fd].append(line)
+    def stdout(self):
+        return b"".join(self.stdouts)
+    def stderr(self):
+        return b"".join(self.stderrs)
+
+def r(command, mode=None, throw=False):
+    """
+    Run the given command, and optionally gather the stdout and stderr
+        mode=Collect to gather, mode=StderrRed to print normal/red for stdout/stderr
+
+    If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
+    """
+    return s(command, print_direct=mode is None).collect(mode).or_throw(throw)
+
+def s(command, print_direct=False):
+    """
+    Run the given command, and optionally gather the stdout and stderr
+
+    If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
+    """
+    return Process(parse_command(command, print_direct), print_direct)
 
 def less(path):
     """

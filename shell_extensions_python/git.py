@@ -5,7 +5,7 @@ A simple interface to git
 from enum import Enum
 from collections import namedtuple
 
-from .run_shell_commands import r
+from .run_shell_commands import r, Collect
 from .basic_shell_programs import pwd
 from .shell_types import ShellBool
 
@@ -19,7 +19,7 @@ def current_repository():
     """
     Get a path to the current repository or raise an error
     """
-    result = r(('git', 'rev-parse', '--show-toplevel'), std=True, err=True, throw=NoRepositoryError)
+    result = r(('git', 'rev-parse', '--show-toplevel'), mode=Collect, throw=NoRepositoryError)
     return result.stdout(single_line=True)
 
 def check_in_repository(func):
@@ -50,7 +50,7 @@ def current_branch():
     """
     Get the current branch we are on as a string
     """
-    result = r(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), std=True, err=True, throw=True)
+    result = r(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), mode=Collect, throw=True)
     return result.stdout(single_line=True)
 
 class NoTrackingBranchError(OSError):
@@ -64,9 +64,9 @@ def tracking_branch():
     """
     Get the branch we are tracking
     """
-    symbolic = r(('git', 'symbolic-ref', '-q', 'HEAD'), std=True, err=True, throw=True)
+    symbolic = r(('git', 'symbolic-ref', '-q', 'HEAD'), mode=Collect, throw=True)
     current_symbol_ref = symbolic.stdout(single_line=True)
-    upstream = r((('git', 'for-each-ref', "--format=%(upstream:short)", current_symbol_ref)), std=True, err=True)
+    upstream = r((('git', 'for-each-ref', "--format=%(upstream:short)", current_symbol_ref)), mode=Collect)
     output = upstream.stdout(as_lines=True)
     assert len(output) <= 1, str(output)
     if not output:
@@ -87,7 +87,7 @@ def commits_wrt_tracking():
     """
     try:
         result = r(('git', 'rev-list', '--left-right', '--count', \
-                            current_branch() + "..." + tracking_branch()), std=True, err=True, throw=True)
+                            current_branch() + "..." + tracking_branch()), mode=Collect, throw=True)
         ahead, behind = result.stdout(single_line=True).split()
         return int(ahead), int(behind)
     except NoTrackingBranchError:
@@ -145,7 +145,7 @@ def status_summary():
     Ouput a list [(status, path)] for all files that would be output by git status.
     """
     results = []
-    for line in r(('git', 'status', '--porcelain'), throw=True, std=True, err=True).stdout(as_lines=True):
+    for line in r(('git', 'status', '--porcelain'), throw=True, mode=Collect).stdout(as_lines=True):
         line = line.strip('\r\n')
         if not line:
             continue
