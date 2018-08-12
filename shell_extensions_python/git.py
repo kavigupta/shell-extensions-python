@@ -200,4 +200,4 @@ def diff(*paths):
     """
     if not paths:
         paths = ['.']
-    return r(['git', 'diff'] + paths)
+    return r(['git', 'diff'] + list(paths))
