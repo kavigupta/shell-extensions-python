@@ -50,7 +50,7 @@ def current_branch():
     """
     Get the current branch we are on as a string
     """
-    result = r(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), mode=Collect, throw=True)
+    result = r(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), mode=Collect)
     return result.stdout(single_line=True)
 
 class NoTrackingBranchError(OSError):
