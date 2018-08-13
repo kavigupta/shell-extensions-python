@@ -163,6 +163,9 @@ def push(remote=None, branch=None):
         command.append(branch)
     return r(command)
 
+def init():
+    return r(['git', 'init'])
+
 def add(*paths):
     """
     Calls git add
