@@ -121,10 +121,10 @@ def mkdir(folder, error_if_exists=False):
         os.makedirs(folder)
     except OSError as e:
         if e.errno == errno.EEXIST and os.path.isdir(folder) and not error_if_exists:
-            return False
+            return ShellBool.false
         else:
             raise
-    return True
+    return ShellBool.true
 
 @autorun
 def cd(path='~'):
