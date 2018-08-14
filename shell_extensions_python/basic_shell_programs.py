@@ -13,7 +13,7 @@ import glob as pyglob
 
 from .autorun import autorun
 from .shell_types import ShellStr, ShellList, ShellBool
-from .path_manipulation import expand_user
+from .path_manipulation import expand_user, join
 from .interactive import Interactive, DisplayPath
 
 @autorun
@@ -131,6 +131,27 @@ def mv(src, dst, overwrite=False, create_dir=True):
             raise RuntimeError("Destination folder %s does not exist" % folder)
     shutil.move(src, dst)
     return ShellBool.true
+
+def move_to(srcs, dst, overwrite=False, create_dir=True):
+    """
+    Moves the files `src` to the folder `dst`. If you want to move `src` to a specific path use `move_to`.
+        overwrite=False:    if `overwrite` is False, will not clobber a file if it exists within `dst`
+        create_dir=True:    if `create_dir` is True, creates all directories above `dst` if necessary
+    """
+    if isinstance(srcs, str):
+        srcs = [srcs]
+    if os.path.exists(dst) and not os.path.isdir(dst):
+        raise RuntimeError("The destination should be a folder but was instead a normal file: %s" % dst)
+    if not os.path.exists(dst):
+        if create_dir:
+            mkdir(dst)
+        else:
+            raise RuntimeError("The destination folder %s does not exist" % dst)
+    result = ShellBool.true
+    for src in srcs:
+        # create_dir isn't necessary
+        result &= mv(src, join(dst, os.path.basename(src)), overwrite=overwrite, create_dir=False)
+    return result
 
 
 def mkdir(folder, error_if_exists=False):

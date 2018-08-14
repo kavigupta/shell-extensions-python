@@ -5,7 +5,7 @@ import unittest
 from random import randint
 from time import sleep
 
-from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, mv, pload, psave, r, s, glob, globs, CannotRemoveDirectoryError
+from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, mv, move_to, pload, psave, r, s, glob, globs, CannotRemoveDirectoryError
 
 from shell_extensions_python.autorun import autorun
 from shell_extensions_python.tcombinator import TCombinator
@@ -267,6 +267,33 @@ class TestMv(unittest.TestCase):
         write('src', 'abc')
         self.assertRaises(RuntimeError, lambda: mv('src', 'folder/file', create_dir=False))
         rm('src')
+
+class TestMoveTo(unittest.TestCase):
+    @reset
+    def test_mv_single_file_to_existing_folder(self):
+        write('file', 'contents')
+        mkdir('folder')
+        move_to('file', 'folder')
+        self.assertEqual(['folder'], ls())
+        self.assertEqual(['file'], ls('folder'))
+        self.assertEqual('contents', cat('folder/file'))
+        rm('folder', recursively=True)
+    @reset
+    def test_mv_single_file_to_nonexistant_folder(self):
+        write('file', 'contents')
+        self.assertRaises(RuntimeError, lambda: move_to('file', 'folder', create_dir=False))
+        move_to('file', 'folder')
+        self.assertEqual(['folder'], ls())
+        self.assertEqual(['file'], ls('folder'))
+        self.assertEqual('contents', cat('folder/file'))
+        rm('folder', recursively=True)
+    @reset
+    def test_mv_single_file_to_existant_file(self):
+        write('file', 'contents')
+        write('other_file', 'contents')
+        self.assertRaises(RuntimeError, lambda: move_to('file', 'other_file'))
+        rm('file', recursively=True)
+        rm('other_file', recursively=True)
 
 class TestTCombinator(unittest.TestCase):
     def test_temporal_zip(self):
