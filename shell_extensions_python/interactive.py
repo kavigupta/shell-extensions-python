@@ -51,16 +51,16 @@ class DisplayPath(str):
         result = str.__new__(cls, path)
         result.type = FileType.classify(join(context, path))
         return result
-    def __repr__(self):
+    def __repr__(self): # pragma: no cover
         return self.type.value + super().__repr__() + Style.RESET_ALL
 
-def is_displayed(value):
+def is_displayed(value): # pragma: no cover
     """
     Whether or not the given value should be displayed on the screen
     """
     return not isinstance(value, (ShellBool, ShellResult))
 
-def modified_displayhook(value, original_displayhook=sys.displayhook):
+def modified_displayhook(value, original_displayhook=sys.displayhook): # pragma: no cover
     """
     Make sure that ShellBool results in no value
     """
