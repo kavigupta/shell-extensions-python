@@ -108,6 +108,27 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
     else:
         raise RuntimeError("The path %s represents an existing file that is not a directory or normal file" % path)
 
+def mv(src, dst, overwrite=False, create_dir=True):
+    """
+    Moves the file `src` to have the name `dst`. If you want to move `src` into a folder use `move_to`.
+        overwrite=False:    if `overwrite` is False, will not clobber a file if it exists at `dst`
+        create_dir=True:    if `create_dir` is True, creates all directories above `dst` if necessary
+    """
+    src = os.path.abspath(expand_user(src))
+    dst = os.path.abspath(expand_user(dst))
+    if os.path.isdir(dst):
+        raise RuntimeError("Destination file %s exists and is a directory: you probably want `move_to`" % dst)
+    if os.path.exists(dst) and not overwrite:
+        raise RuntimeError("Destination file %s exists" % dst)
+    folder = os.path.dirname(dst)
+    if not os.path.exists(folder):
+        if create_dir:
+            mkdir(folder)
+        else:
+            raise RuntimeError("Destination folder %s does not exist" % folder)
+    shutil.move(src, dst)
+    return ShellBool.true
+
 
 def mkdir(folder, error_if_exists=False):
     """
