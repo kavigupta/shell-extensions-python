@@ -65,6 +65,15 @@ class TestCd(unittest.TestCase):
         self.assertEqual(ShellBool.true, cd('..'))
         self.assertRaises(FileNotFoundError, lambda: cd('does-not-exist'))
         rm('path')
+    @reset
+    def test_invalid_cd_argument(self):
+        cd.stack = [pwd(), pwd()]
+        self.assertRaises(RuntimeError, lambda: cd(0))
+        self.assertRaises(RuntimeError, lambda: cd(2))
+        self.assertRaises(RuntimeError, lambda: cd(3))
+        self.assertEqual([pwd(), pwd()], cd.stack)
+        cd(1)
+        self.assertRaises(TypeError, lambda: cd(None))
 
 
 class TestLs(unittest.TestCase):
