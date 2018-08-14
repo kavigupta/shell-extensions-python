@@ -181,7 +181,7 @@ def globs(glob_str):
     """
     Returns all the possible glob expansions of the given string
     """
-    return pyglob.glob(expand_user(glob_str))
+    return sorted(pyglob.glob(expand_user(glob_str)))
 
 def glob(glob_str):
     """

@@ -5,7 +5,7 @@ import unittest
 from random import randint
 from time import sleep
 
-from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, mv, pload, psave, r, s, CannotRemoveDirectoryError
+from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, mv, pload, psave, r, s, glob, globs, CannotRemoveDirectoryError
 
 from shell_extensions_python.autorun import autorun
 from shell_extensions_python.tcombinator import TCombinator
@@ -179,6 +179,28 @@ class TestPickle(unittest.TestCase):
         self.assertEqual(ShellBool.true, psave('test.pkl', [1, 2, 3]))
         self.assertEqual(pload('test.pkl'), [1, 2, 3])
         rm('test.pkl')
+
+class TestGlobs(unittest.TestCase):
+    @reset
+    def test_glob_empty(self):
+        self.assertEqual([], globs("*"))
+        self.assertRaises(RuntimeError, lambda: glob("*"))
+    @reset
+    def test_glob_single(self):
+        write('file', 'contents')
+        write('second_file', 'contents')
+        self.assertEqual(['file'], globs("f*"))
+        self.assertEqual('file', glob("f*"))
+        rm('file')
+        rm('second_file')
+    @reset
+    def test_glob_multiple(self):
+        write('file', 'contents')
+        write('second_file', 'contents')
+        self.assertEqual(['file', 'second_file'], globs("*f*"))
+        self.assertRaises(RuntimeError, lambda: glob("*f*"))
+        rm('file')
+        rm('second_file')
 
 class TestRun(unittest.TestCase):
     @reset
