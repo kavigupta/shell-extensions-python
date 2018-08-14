@@ -43,6 +43,8 @@ class ShellResult:
     @staticmethod
     def _process(raw, single_line, as_lines):
         result = raw.decode('utf-8')
+        if single_line and as_lines:
+            raise RuntimeError("Incompatible arguments: single_line=True, as_lines=True")
         if single_line:
             lines = [x for x in result.split(os.linesep) if x]
             if len(lines) != 1:
