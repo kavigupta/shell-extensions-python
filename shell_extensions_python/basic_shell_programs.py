@@ -196,7 +196,7 @@ def glob(glob_str):
         return results[0]
 
 @autorun
-def whoami():
+def whoami(): # pragma: no cover
     """
     Get the current user
     """
