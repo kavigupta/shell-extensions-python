@@ -30,3 +30,9 @@ def dirname(path):
     Get the directory of the given path
     """
     return os.path.dirname(path)
+
+def join(path, name):
+    """
+    Return $path/$name
+    """
+    return os.path.join(path, name)
