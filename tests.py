@@ -151,6 +151,11 @@ class TestRm(unittest.TestCase):
         Interactive.ask_question = lambda _: "y"
         self.assertEqual(ShellBool.true, rm("path"))
         self.assertEqual([], ls())
+    @reset
+    def test_rm_symlink(self):
+        r('ln -s . link')
+        self.assertRaises(RuntimeError, lambda: rm('link'))
+        r('rm link')
 
 class TestPickle(unittest.TestCase):
     @reset

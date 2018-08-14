@@ -81,13 +81,16 @@ def rm(path, ignore_missing=False, recursively=False, interactive=True):
     recursively: remove a directory recursively if it contains values
     interactive: prompt rather than erroring if you encounter a file you are not allowed to delete
     """
+
+    # TODO handle symbolic links better
+
     path = expand_user(path)
     if not os.path.exists(path):
         if ignore_missing:
             return ShellBool.true
         else:
             raise FileNotFoundError("The file %s cannot be removed as it does not exist" % path)
-    elif os.path.isdir(path):
+    elif os.path.isdir(path) and not os.path.islink(path):
         if ls(path) == []:
             os.rmdir(path)
             return ShellBool.true
