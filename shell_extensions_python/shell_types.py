@@ -35,7 +35,7 @@ class ShellList(list):
         """
         Converts to a single file with the given unlines
         """
-        return ShellStr(os.linesep.join(self) + os.linesep)
+        return ShellStr(os.linesep.join(self))
 
 class ShellBool(Enum):
     """
