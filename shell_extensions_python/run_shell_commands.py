@@ -157,7 +157,7 @@ class Consumer(metaclass=ABCMeta):
         Returns the stderr seen
         """
 
-class StderrRed(Consumer):
+class StderrRed(Consumer): # pragma: no cover
     """
     Prints standard out and standard error to the screen.
     """
@@ -205,7 +205,7 @@ def s(command, print_direct=False):
     """
     return Process(parse_command(command, print_direct), print_direct)
 
-def less(path):
+def less(path): # pragma: no cover
     """
     Runs the linux command less on a file
     """
