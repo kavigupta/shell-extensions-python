@@ -172,6 +172,9 @@ def add(*paths):
     """
     return r(['git', 'add'] + list(paths))
 
+def reset():
+    return r(['git', 'reset'])
+
 def show_staged():
     """
     Calls git diff --staged, shows staged changes
