@@ -43,5 +43,19 @@ class ShellBool(Enum):
     """
     true = True
     false = False
+    @staticmethod
+    def create(boolean_value):
+        """
+        Creates a ShellBool from an existing boolean value
+        """
+        if boolean_value:
+            return ShellBool.true
+        return ShellBool.false
     def __bool__(self):
         return self.value
+    def __and__(self, other):
+        return ShellBool.create(bool(self) & bool(other))
+    def __or__(self, other):
+        return ShellBool.create(bool(self) | bool(other))
+    def __xor__(self, other):
+        return ShellBool.create(bool(self) ^ bool(other))
