@@ -146,7 +146,7 @@ def mkdir(folder, error_if_exists=False):
     except OSError as e:
         if e.errno == errno.EEXIST and os.path.isdir(folder) and not error_if_exists:
             return ShellBool.false
-        else:
+        else: # pragma: no cover
             raise
     return ShellBool.true
 

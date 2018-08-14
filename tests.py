@@ -125,6 +125,13 @@ class TestWrite(unittest.TestCase):
     def test_argument_conflict(self):
         self.assertRaises(ValueError, lambda: write('hi', 'hi', clobber=True, append=True))
 
+class TestMkdir(unittest.TestCase):
+    @reset
+    def test_mkdir(self):
+        self.assertEqual(ShellBool.true, mkdir('folder'))
+        self.assertEqual(ShellBool.false, mkdir('folder'))
+        rm('folder')
+
 class TestRm(unittest.TestCase):
     @reset
     def test_rm_dne(self):
