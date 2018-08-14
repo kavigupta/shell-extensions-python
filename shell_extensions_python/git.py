@@ -164,6 +164,9 @@ def push(remote=None, branch=None):
     return r(command)
 
 def init():
+    """
+    Calls git init
+    """
     return r(['git', 'init'])
 
 def add(*paths):
@@ -173,6 +176,9 @@ def add(*paths):
     return r(['git', 'add'] + list(paths))
 
 def reset():
+    """
+    Calls git reset
+    """
     return r(['git', 'reset'])
 
 def show_staged():
