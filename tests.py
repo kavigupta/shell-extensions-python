@@ -7,6 +7,7 @@ from time import sleep
 
 from shell_extensions_python import cd, pwd, ls, mkdir, cat, write, rm, mv, pload, psave, r, s, CannotRemoveDirectoryError
 
+from shell_extensions_python.autorun import autorun
 from shell_extensions_python.tcombinator import TCombinator
 
 from shell_extensions_python.shell_types import ShellBool
@@ -236,6 +237,14 @@ class TestTCombinator(unittest.TestCase):
             sleep(0.2)
             yield 4
         self.assertEqual([1, 2, 3, 4, 5], list(TCombinator(generator1(), generator2())))
+
+class TestAutoRun(unittest.TestCase):
+    @reset
+    def test_autorun(self):
+        @autorun
+        def f():
+            return 2
+        self.assertEqual(2, f.__repr_proxy__())
 
 if __name__ == '__main__':
     unittest.main()
