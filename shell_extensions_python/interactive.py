@@ -8,6 +8,7 @@ import sys
 from enum import Enum
 from colorama import Fore, Style
 
+from .path_manipulation import join
 from .run_shell_commands import ShellResult
 from .shell_types import ShellBool
 
@@ -48,7 +49,7 @@ class DisplayPath(str):
     """
     def __new__(cls, path, context):
         result = str.__new__(cls, path)
-        result.type = FileType.classify(os.path.join(context, path))
+        result.type = FileType.classify(join(context, path))
         return result
     def __repr__(self):
         return self.type.value + super().__repr__() + Style.RESET_ALL

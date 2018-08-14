@@ -13,7 +13,7 @@ import glob as pyglob
 
 from .autorun import autorun
 from .shell_types import ShellStr, ShellList, ShellBool
-from .path_manipulation import expand_user, join
+from .path_manipulation import expand_user, join, basename, dirname
 from .interactive import Interactive, DisplayPath
 
 @autorun
@@ -32,7 +32,7 @@ def ls(path='.', sort_key=lambda x: x, a=True, full=False):
     if not a:
         result = [x for x in result if x[0] != '.']
     if full:
-        result = [os.path.join(path, x) for x in result]
+        result = [join(path, x) for x in result]
     return ShellList(result)
 
 def cat(filename, mode=''):
@@ -123,7 +123,7 @@ def mv(src, dst, overwrite=False, create_dir=True):
         raise RuntimeError("Destination file %s exists and is a directory: you probably want `move_to`" % dst)
     if os.path.exists(dst) and not overwrite:
         raise RuntimeError("Destination file %s exists" % dst)
-    folder = os.path.dirname(dst)
+    folder = dirname(dst)
     if not os.path.exists(folder):
         if create_dir:
             mkdir(folder)
@@ -150,7 +150,7 @@ def move_to(srcs, dst, overwrite=False, create_dir=True):
     result = ShellBool.true
     for src in srcs:
         # create_dir isn't necessary
-        result &= mv(src, join(dst, os.path.basename(src)), overwrite=overwrite, create_dir=False)
+        result &= mv(src, join(dst, basename(src)), overwrite=overwrite, create_dir=False)
     return result
 
 

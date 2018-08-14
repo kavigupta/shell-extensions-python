@@ -7,6 +7,8 @@ import os.path
 
 from enum import Enum
 
+from .path_manipulation import basename
+
 class ShellStr(str):
     """
     A wrapper around str with a few additional properties
@@ -25,7 +27,7 @@ class ShellStr(str):
         """
         Gets the file name of the given path
         """
-        return ShellStr(os.path.basename(self))
+        return ShellStr(basename(self))
 
 class ShellList(list):
     """
