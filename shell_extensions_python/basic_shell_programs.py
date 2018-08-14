@@ -165,7 +165,8 @@ def cd(path='~'):
         if path < 1:
             raise RuntimeError("path should be a number > 1")
         if path >= len(cd.stack):
-            raise RuntimeError("No such history entry: %s; available entries are %s" % (path, list(range(len(cd.stack) - 1))))
+            raise RuntimeError("No such history entry: %s; available entries are %s" \
+                % (path, list(range(len(cd.stack) - 1))))
         path = -path - 1 # pylint: disable=E1130
         path_str = cd.stack[path]
         cd.stack = cd.stack[:path]
