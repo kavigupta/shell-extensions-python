@@ -121,6 +121,9 @@ class TestWrite(unittest.TestCase):
     def test_Return_value(self):
         self.assertEqual(ShellBool.true, write('hi', 'hi'))
         rm('hi')
+    @reset
+    def test_argument_conflict(self):
+        self.assertRaises(ValueError, lambda: write('hi', 'hi', clobber=True, append=True))
 
 class TestRm(unittest.TestCase):
     @reset

@@ -48,7 +48,7 @@ def write(filename, contents, clobber=False, append=False):
     Write the contents to the given file
     """
     if clobber and append:
-        raise RuntimeError("clobbering and appending are mutually exclusive")
+        raise ValueError("clobbering and appending are mutually exclusive")
     elif clobber:
         mode = 'w'
     elif append:
