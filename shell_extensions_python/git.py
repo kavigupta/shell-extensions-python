@@ -87,11 +87,11 @@ def commits_wrt_tracking():
     """
     try:
         result = re('git',
-                   'rev-list',
-                   '--left-right',
-                   '--count',
-                   current_branch() + "..." + tracking_branch(),
-                   mode=Collect) or throw(ProcessFailedException)
+                    'rev-list',
+                    '--left-right',
+                    '--count',
+                    current_branch() + "..." + tracking_branch(),
+                    mode=Collect) or throw(ProcessFailedException)
         ahead, behind = result.stdout(single_line=True).split()
         return int(ahead), int(behind)
     except NoTrackingBranchError:
