@@ -44,4 +44,3 @@ class TestRun(unittest.TestCase):
     @reset
     def test_collect(self):
         self.assertEqual('abc\n', (s('echo abc') > Collect).stdout())
-        self.assertEqual('abc\n', (s('echo abc').collect(Collect)).stdout())

@@ -111,7 +111,7 @@ class Process:
         if self._exitcode is not None:
             return self._exitcode
         raise RuntimeError("No exit code for the current process")
-    def collect(self, consumer_type):
+    def __gt__(self, consumer_type):
         """
         Runs the given shell consumer on the contents of this process, then returns the exit code
         """
@@ -122,8 +122,6 @@ class Process:
         for fd, line in self:
             consumer.consume(fd, line)
         return ShellResult(consumer.stdout(), consumer.stderr(), self.exitcode)
-    def __gt__(self, other):
-        return self.collect(other)
 
 class Consumer(metaclass=ABCMeta):
     """
@@ -192,7 +190,7 @@ def r(command, mode=None):
 
     If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
     """
-    return s(command, print_direct=mode is None).collect(mode)
+    return s(command, print_direct=mode is None) > mode
 
 def s(command, print_direct=False):
     """
