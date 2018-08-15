@@ -177,26 +177,29 @@ class Collect(Consumer):
 def re(*command, mode=None):
     """
     Run the given command, and optionally gather the stdout and stderr
-        See r for meaning of mode/None
+        mode=Collect to gather, mode=StderrRed to print normal/red for stdout/stderr
 
     Does not do any shell expansion
     """
-    return r(command, mode=mode)
+    return se(*command, print_direct=mode is None) > mode
 
 def r(command, mode=None):
     """
-    Run the given command, and optionally gather the stdout and stderr
-        mode=Collect to gather, mode=StderrRed to print normal/red for stdout/stderr
-
-    If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
+    Like re, but does shell expansion on its string argument
     """
     return s(command, print_direct=mode is None) > mode
 
+def se(*command, print_direct=False):
+    """
+    Run the given command, and allow ability to gather output
+
+    Does not do any shell expansion
+    """
+    return Process(parse_command(command, print_direct), print_direct)
+
 def s(command, print_direct=False):
     """
-    Run the given command, and optionally gather the stdout and stderr
-
-    If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
+    Like se, but does shell expansion on its string argument
     """
     return Process(parse_command(command, print_direct), print_direct)
 
