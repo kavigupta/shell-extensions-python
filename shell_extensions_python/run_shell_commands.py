@@ -52,6 +52,30 @@ class ShellResult:
             as_lines: return a list of lines.
         """
         return self._process(self._stdout, single_line=single_line, as_lines=as_lines)
+    def _combine(self, other, returncode_combiner):
+        # pylint: disable=protected-access
+        return ShellResult(self._stdout + other._stdout,
+                           self._stderr + other._stderr,
+                           returncode_combiner(self.returncode, other.returncode))
+    def __or__(self, other):
+        """
+        r(x) | r(y) to run both x and y and return success if either returned success
+        """
+        # not (not x or not y)
+        return self._combine(other, lambda x, y: x and y)
+    def __and__(self, other):
+        """
+        r(x) & r(y) to run both x and y and return success if both returned success
+        """
+        # not (not x and not y)
+        return self._combine(other, lambda x, y: x or y)
+    def __add__(self, other):
+        """
+        r(x) + r(y) to run both x and y and return success if y returned success. In bash:
+            { x; y }
+        """
+        # not (not x and not y)
+        return self._combine(other, lambda x, y: y)
 
 class FD(Enum):
     """

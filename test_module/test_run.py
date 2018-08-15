@@ -44,3 +44,21 @@ class TestRun(unittest.TestCase):
     @reset
     def test_collect(self):
         self.assertEqual('abc\n', (s('echo abc') > Collect).stdout())
+    @reset
+    def test_or(self):
+        result = r('echo 2; false', mode=Collect) | r('echo 3; true', mode=Collect)
+        self.assertEqual('2\n3\n', result.stdout())
+        self.assertTrue(result)
+    @reset
+    def test_and(self):
+        result = r('echo 2; false', mode=Collect) & r('echo 3; true', mode=Collect)
+        self.assertEqual('2\n3\n', result.stdout())
+        self.assertFalse(result)
+    @reset
+    def test_add(self):
+        result = r('echo 2; false', mode=Collect) + r('echo 3; true', mode=Collect)
+        self.assertEqual('2\n3\n', result.stdout())
+        self.assertTrue(result)
+        result = r('echo 2; true', mode=Collect) + r('echo 3; false', mode=Collect)
+        self.assertEqual('2\n3\n', result.stdout())
+        self.assertFalse(result)
