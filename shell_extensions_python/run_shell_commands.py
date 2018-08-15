@@ -12,16 +12,6 @@ from .colors import PrintColors
 from .path_manipulation import expand_user
 from .tcombinator import TCombinator
 
-def iterable(value):
-    """
-    Returns True iff the given value is iterable
-    """
-    try:
-        iter(value)
-        return True
-    except: # pylint: disable=bare-except
-        return False
-
 class ProcessFailedException(RuntimeError):
     """
     An exception representing a failed process
@@ -69,22 +59,6 @@ class FD(Enum):
     """
     stdout = 1
     stderr = 2
-
-def parse_command(command, print_direct):
-    """
-    Parses the given into a subprocess call.
-    """
-    pipe = None if print_direct else subprocess.PIPE
-    if isinstance(command, str):
-        return subprocess.Popen(command, shell=True, stdout=pipe, stderr=pipe)
-    elif iterable(command):
-        command = list(command)
-        if all(isinstance(x, str) for x in command):
-            return subprocess.Popen(command, stdout=pipe, stderr=pipe)
-        else:
-            raise RuntimeError("Cannot run %s: it has non-string elements" % command)
-    else:
-        raise RuntimeError("Expected str or some iterable, but got %s" % type(command))
 
 class Process:
     """
@@ -195,13 +169,19 @@ def se(*command, print_direct=False):
 
     Does not do any shell expansion
     """
-    return Process(parse_command(command, print_direct), print_direct)
+    pipe = None if print_direct else subprocess.PIPE
+    if not all(isinstance(x, str) for x in command):
+        raise RuntimeError("Cannot run %s: it has non-string elements" % command)
+    return Process(subprocess.Popen(command, stdout=pipe, stderr=pipe), print_direct)
 
 def s(command, print_direct=False):
     """
     Like se, but does shell expansion on its string argument
     """
-    return Process(parse_command(command, print_direct), print_direct)
+    pipe = None if print_direct else subprocess.PIPE
+    if not isinstance(command, str):
+        raise RuntimeError("command argument to s must be of type str but was %s" % type(command))
+    return Process(subprocess.Popen(command, shell=True, stdout=pipe, stderr=pipe), print_direct)
 
 def throw(exc):
     """
