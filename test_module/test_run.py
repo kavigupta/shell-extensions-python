@@ -31,12 +31,6 @@ class TestRun(unittest.TestCase):
         self.assertEqual(True, bool(r('true')))
         self.assertEqual(False, bool(r('false')))
     @reset
-    def test_or_throw(self):
-        r('true').or_throw()
-        r('false').or_throw(throw=False)
-        self.assertRaises(ProcessFailedException, lambda: r('false').or_throw())
-        self.assertRaises(FileNotFoundError, lambda: r('false').or_throw(throw=FileNotFoundError))
-    @reset
     def test_return_value(self):
         self.assertEqual("", repr(r('true')))
     @reset

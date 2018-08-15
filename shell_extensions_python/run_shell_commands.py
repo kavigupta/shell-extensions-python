@@ -63,20 +63,6 @@ class ShellResult:
         """
         return self._process(self._stdout, single_line=single_line, as_lines=as_lines)
 
-    def or_throw(self, throw=True): # pylint: disable=R1710
-        """
-        Throws if throw is truthy, and the return code was failure.
-
-        You can set throw to be an exception to throw it
-        """
-        if self:
-            return self # not an error
-        if not throw:
-            return self
-        if throw is True:
-            raise ProcessFailedException
-        raise throw # pylint: disable=E0702
-
 class FD(Enum):
     """
     File descriptors, either stdout or stderr
@@ -190,23 +176,23 @@ class Collect(Consumer):
     def stderr(self):
         return b"".join(self.stderrs)
 
-def e(*command, mode=None, throw=False):
+def e(*command, mode=None):
     """
     Run the given command, and optionally gather the stdout and stderr
         See r for meaning of mode/None
 
     Does not do any shell expansion
     """
-    return r(command, mode=mode, throw=throw)
+    return r(command, mode=mode)
 
-def r(command, mode=None, throw=False):
+def r(command, mode=None):
     """
     Run the given command, and optionally gather the stdout and stderr
         mode=Collect to gather, mode=StderrRed to print normal/red for stdout/stderr
 
     If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
     """
-    return s(command, print_direct=mode is None).collect(mode).or_throw(throw)
+    return s(command, print_direct=mode is None).collect(mode)
 
 def s(command, print_direct=False):
     """
@@ -215,6 +201,13 @@ def s(command, print_direct=False):
     If throw is true, this raises a RuntimeError whenever the result has a nonzero exit code
     """
     return Process(parse_command(command, print_direct), print_direct)
+
+def throw(exc):
+    """
+    Raise the given error. To be used like
+        r('make') or throw(RuntimeError("make failed"))
+    """
+    raise exc
 
 def less(path): # pragma: no cover
     """
