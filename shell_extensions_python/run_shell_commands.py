@@ -174,7 +174,7 @@ class Collect(Consumer):
     def stderr(self):
         return b"".join(self.stderrs)
 
-def e(*command, mode=None):
+def re(*command, mode=None):
     """
     Run the given command, and optionally gather the stdout and stderr
         See r for meaning of mode/None
@@ -211,10 +211,10 @@ def less(path): # pragma: no cover
     """
     Runs the linux command less on a file
     """
-    return e('less', expand_user(path))
+    return re('less', expand_user(path))
 
 def cp(src, dest):
     """
     Runs the linux command cp on a file
     """
-    return e('cp', expand_user(src), expand_user(dest))
+    return re('cp', expand_user(src), expand_user(dest))
