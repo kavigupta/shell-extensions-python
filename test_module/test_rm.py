@@ -3,7 +3,6 @@ import unittest
 
 from shell_extensions_python import mkdir, rm, ls, write, CannotRemoveDirectoryError, r
 from shell_extensions_python.interactive import Interactive
-from shell_extensions_python.shell_types import ShellBool
 
 from .utilities import reset
 
