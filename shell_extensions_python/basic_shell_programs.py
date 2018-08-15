@@ -227,3 +227,20 @@ def whoami(): # pragma: no cover
     Get the current user
     """
     return getpass.getuser()
+
+def symlink(target_path, link_path, overwrite=False, ignore_missing=False):
+    """
+    Creates a symbolic link at location `link_path` that points to path `target_path`.
+
+    `overwrite=True` means it is OK to overwrite a link or normal file at location link_path if one exists
+        If you want to overwrite a directory, remove it first
+    `ignore_missing=True` means it is OK to link to a missing `target_path`
+    """
+    if os.path.exists(link_path):
+        if overwrite and (os.path.islink(link_path) or os.path.isfile(link_path)):
+            rm(link_path)
+        else:
+            raise RuntimeError("Attempt to write link to path %s but there is a file at that location" % link_path)
+    if not os.path.exists(target_path) and not ignore_missing:
+        raise FileNotFoundError("Target path %s not found" % target_path)
+    os.symlink(target_path, link_path)
