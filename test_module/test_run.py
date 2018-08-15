@@ -1,7 +1,7 @@
 
 import unittest
 
-from shell_extensions_python import write, ls, r, s, rm, Collect, ProcessFailedException
+from shell_extensions_python import write, ls, r, e, s, rm, Collect, ProcessFailedException
 from shell_extensions_python.run_shell_commands import FD
 
 from .utilities import reset
@@ -15,7 +15,7 @@ class TestRun(unittest.TestCase):
         rm('test2')
     @reset
     def test_with_args(self):
-        self.assertEqual('-n with space', r(('echo', '-n with space'), mode=Collect).stdout(single_line=True))
+        self.assertEqual('-n with space', e('echo', '-n with space', mode=Collect).stdout(single_line=True))
     @reset
     def test_invalid_args(self):
         self.assertRaises(RuntimeError, lambda: r(None))

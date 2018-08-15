@@ -190,6 +190,15 @@ class Collect(Consumer):
     def stderr(self):
         return b"".join(self.stderrs)
 
+def e(*command, mode=None, throw=False):
+    """
+    Run the given command, and optionally gather the stdout and stderr
+        See r for meaning of mode/None
+
+    Does not do any shell expansion
+    """
+    return r(command, mode=mode, throw=throw)
+
 def r(command, mode=None, throw=False):
     """
     Run the given command, and optionally gather the stdout and stderr
@@ -211,10 +220,10 @@ def less(path): # pragma: no cover
     """
     Runs the linux command less on a file
     """
-    return r(['less', expand_user(path)])
+    return e('less', expand_user(path))
 
 def cp(src, dest):
     """
     Runs the linux command cp on a file
     """
-    return r(['cp', expand_user(src), expand_user(dest)])
+    return e('cp', expand_user(src), expand_user(dest))

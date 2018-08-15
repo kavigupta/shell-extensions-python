@@ -5,7 +5,7 @@ A simple interface to git
 from enum import Enum
 from collections import namedtuple
 
-from .run_shell_commands import r, Collect
+from .run_shell_commands import e, Collect
 from .basic_shell_programs import pwd
 from .shell_types import ShellBool
 
@@ -19,7 +19,7 @@ def current_repository():
     """
     Get a path to the current repository or raise an error
     """
-    result = r(('git', 'rev-parse', '--show-toplevel'), mode=Collect, throw=NoRepositoryError)
+    result = e('git', 'rev-parse', '--show-toplevel', mode=Collect, throw=NoRepositoryError)
     return result.stdout(single_line=True)
 
 def check_in_repository(func):
@@ -50,7 +50,7 @@ def current_branch():
     """
     Get the current branch we are on as a string
     """
-    result = r(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), mode=Collect)
+    result = e('git', 'rev-parse', '--abbrev-ref', 'HEAD', mode=Collect)
     return result.stdout(single_line=True)
 
 class NoTrackingBranchError(OSError):
@@ -64,9 +64,9 @@ def tracking_branch():
     """
     Get the branch we are tracking
     """
-    symbolic = r(('git', 'symbolic-ref', '-q', 'HEAD'), mode=Collect, throw=True)
+    symbolic = e('git', 'symbolic-ref', '-q', 'HEAD', mode=Collect, throw=True)
     current_symbol_ref = symbolic.stdout(single_line=True)
-    upstream = r((('git', 'for-each-ref', "--format=%(upstream:short)", current_symbol_ref)), mode=Collect)
+    upstream = e('git', 'for-each-ref', "--format=%(upstream:short)", current_symbol_ref, mode=Collect)
     output = upstream.stdout(as_lines=True)
     assert len(output) <= 1, str(output)
     if not output:
@@ -78,7 +78,7 @@ def set_tracking_branch(to_track):
     """
     Sets the branch this branch is tracking
     """
-    r(('git', 'branch', '-u', to_track))
+    e('git', 'branch', '-u', to_track)
 
 @check_in_repository
 def commits_wrt_tracking():
@@ -86,8 +86,13 @@ def commits_wrt_tracking():
     Get the number of commits off from the tracking branch (ahead, behind)
     """
     try:
-        result = r(('git', 'rev-list', '--left-right', '--count', \
-                            current_branch() + "..." + tracking_branch()), mode=Collect, throw=True)
+        result = e('git',
+                   'rev-list',
+                   '--left-right',
+                   '--count',
+                   current_branch() + "..." + tracking_branch(),
+                   mode=Collect,
+                   throw=True)
         ahead, behind = result.stdout(single_line=True).split()
         return int(ahead), int(behind)
     except NoTrackingBranchError:
@@ -98,7 +103,7 @@ def status():
     """
     Literally just run git status
     """
-    r('git status')
+    e('git', 'status')
 
 class GitStatusCategory(Enum):
     """
@@ -145,7 +150,7 @@ def status_summary():
     Ouput a list [(status, path)] for all files that would be output by git status.
     """
     results = []
-    for line in r(('git', 'status', '--porcelain'), throw=True, mode=Collect).stdout(as_lines=True):
+    for line in e('git', 'status', '--porcelain', throw=True, mode=Collect).stdout(as_lines=True):
         line = line.strip('\r\n')
         if not line:
             continue
@@ -161,31 +166,31 @@ def push(remote=None, branch=None):
         command.append(remote)
     if branch is not None:
         command.append(branch)
-    return r(command)
+    return e(*command)
 
 def init():
     """
     Calls git init
     """
-    return r(['git', 'init'])
+    return e('git', 'init')
 
 def add(*paths):
     """
     Calls git add
     """
-    return r(['git', 'add'] + list(paths))
+    return e('git', 'add', *paths)
 
 def reset():
     """
     Calls git reset
     """
-    return r(['git', 'reset'])
+    return e('git', 'reset')
 
 def show_staged():
     """
     Calls git diff --staged, shows staged changes
     """
-    return r(['git', 'diff', '--staged'])
+    return e('git', 'diff', '--staged')
 
 def commit(message, review=False):
     """
@@ -198,13 +203,13 @@ def commit(message, review=False):
         show_staged()
         if not input("Do you want to commit? [yN] ") == "y":
             return ShellBool.false
-    return r(['git', 'commit', '-m', message])
+    return e('git', 'commit', '-m', message)
 
 def pull_ff():
     """
     Calls git commit --ff-only. Returns False if it doesn't succeed.
     """
-    return bool(r(['git', 'pull', '--ff-only']))
+    return bool(e('git', 'pull', '--ff-only'))
 
 def diff(*paths):
     """
@@ -212,4 +217,4 @@ def diff(*paths):
     """
     if not paths:
         paths = ['.']
-    return r(['git', 'diff'] + list(paths))
+    return e('git', 'diff', *paths)
