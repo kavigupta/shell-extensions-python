@@ -16,13 +16,11 @@ class TestGlobs(unittest.TestCase):
         write('second_file', 'contents')
         self.assertEqual(['file'], globs("f*"))
         self.assertEqual('file', glob("f*"))
-        rm('file')
-        rm('second_file')
+        rm('file', 'second_file')
     @reset
     def test_glob_multiple(self):
         write('file', 'contents')
         write('second_file', 'contents')
         self.assertEqual(['file', 'second_file'], globs("*f*"))
         self.assertRaises(RuntimeError, lambda: glob("*f*"))
-        rm('file')
-        rm('second_file')
+        rm('file', 'second_file')

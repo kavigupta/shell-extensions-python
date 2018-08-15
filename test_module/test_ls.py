@@ -29,16 +29,14 @@ class TestLs(unittest.TestCase):
         write(".hidden", '')
         self.assertEqual(ls(), [".hidden", "shown"])
         self.assertEqual(ls(a=False), ["shown"])
-        rm("shown")
-        rm(".hidden")
+        rm("shown", ".hidden")
     @reset
     def test_sorted_ls(self):
         paths = [hex(randint(0, 0x10000000000)) for _ in range(50)]
         for path in paths:
             write(path, '')
         self.assertEqual(sorted(paths), ls())
-        for path in paths:
-            rm(path)
+        rm(*paths)
     @reset
     def test_colors(self):
         write('file', 'contents')
@@ -54,9 +52,7 @@ class TestLs(unittest.TestCase):
         self.assertEqual(FileType.executable, executable.type)
         self.assertEqual(FileType.directory, folder.type)
         self.assertEqual(FileType.link, link.type)
-        rm('file')
-        rm('folder')
-        rm('executable')
+        rm('file', 'folder', 'executable')
         r('rm link')
     @reset
     def test_missing(self):

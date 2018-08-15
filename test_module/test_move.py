@@ -14,8 +14,7 @@ class TestMv(unittest.TestCase):
         write('src', 'abc')
         mkdir('folder')
         self.assertRaises(RuntimeError, lambda: mv('src', 'folder'))
-        rm('folder')
-        rm('src')
+        rm('folder', 'src')
     @reset
     def test_mv_dst_exists(self):
         write('src', 'abc')
@@ -70,5 +69,4 @@ class TestMoveTo(unittest.TestCase):
         write('file', 'contents')
         write('other_file', 'contents')
         self.assertRaises(RuntimeError, lambda: move_to('file', 'other_file'))
-        rm('file', recursively=True)
-        rm('other_file', recursively=True)
+        rm('file', 'other_file', recursively=True)

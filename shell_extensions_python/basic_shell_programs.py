@@ -73,41 +73,46 @@ class CannotRemoveDirectoryError(OSError):
     def __init__(self, path):
         super().__init__("Cannot remove directory %s, it has contents" % path)
 
-def rm(path, ignore_missing=False, recursively=False, interactive=True):
+def rm(*paths, ignore_missing=False, recursively=False, interactive=True):
     """
-    Removes the given normal file or empty folder.
+    Removes the given collection of normal files and empty folders. If any removal is illegal,
+        no files are removed.
 
     ignore_missing: do not error if the file does not exist
     recursively: remove a directory recursively if it contains values
     interactive: prompt rather than erroring if you encounter a file you are not allowed to delete
     """
-
     # TODO handle symbolic links better
+    removes = [_rm(path, ignore_missing, recursively, interactive) for path in paths]
+    for remove in removes:
+        remove()
 
+def _rm(path, ignore_missing, recursively, interactive):
+    """
+    Returns a command that removes the given path, or raises an error if it does not work
+
+    See `rm` for the meanings of the arguments
+    """
     path = expand_user(path)
     if not os.path.exists(path):
         if ignore_missing:
-            return ShellBool.true
+            return lambda: None
         else:
             raise FileNotFoundError("The file %s cannot be removed as it does not exist" % path)
     elif os.path.isdir(path) and not os.path.islink(path):
         if ls(path) == []:
-            os.rmdir(path)
-            return ShellBool.true
+            return lambda: os.rmdir(path)
         elif recursively:
-            shutil.rmtree(path)
-            return ShellBool.true
+            return lambda: shutil.rmtree(path)
         elif interactive:
             if Interactive.ask_question(("Are you sure you want to remove %s:" \
                     + " it is a directory with contents [yN]: ") % path) == 'y':
-                shutil.rmtree(path)
-                return ShellBool.true
-            return ShellBool.false
+                return lambda: shutil.rmtree(path)
+            return lambda: None
         else:
             raise CannotRemoveDirectoryError(path)
     elif os.path.isfile(path):
-        os.remove(path)
-        return ShellBool.true
+        return lambda: os.remove(path)
     else:
         raise RuntimeError("The path %s represents an existing file that is not a directory or normal file" % path)
 

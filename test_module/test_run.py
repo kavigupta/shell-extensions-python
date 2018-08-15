@@ -11,8 +11,7 @@ class TestRun(unittest.TestCase):
     def test_chaining(self):
         write('test', '') and write('test2', '')
         self.assertEqual(ls(), ['test', 'test2'])
-        rm('test')
-        rm('test2')
+        rm('test', 'test2')
     @reset
     def test_with_args(self):
         self.assertEqual('-n with space', re('echo', '-n with space', mode=Collect).stdout(single_line=True))
