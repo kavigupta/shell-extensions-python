@@ -1,7 +1,7 @@
 
 import unittest
 
-from shell_extensions_python import mkdir, rm, ls, write, CannotRemoveDirectoryError, r
+from shell_extensions_python import mkdir, rm, symlink, ls, write, CannotRemoveDirectoryError, r
 from shell_extensions_python.interactive import Interactive
 
 from .utilities import reset
@@ -34,9 +34,18 @@ class TestRm(unittest.TestCase):
         self.assertEqual([], ls())
     @reset
     def test_rm_symlink(self):
-        r('ln -s . link')
-        self.assertRaises(RuntimeError, lambda: rm('link'))
-        r('rm link')
+        write('file', 'contents')
+        symlink('file', 'link')
+        rm('link')
+        self.assertEqual(['file'], ls())
+        rm('file')
+    @reset
+    def test_rm_symlink_to_folder(self):
+        mkdir('folder')
+        symlink('folder', 'link')
+        rm('link')
+        self.assertEqual(['folder'], ls())
+        rm('folder')
     @reset
     def test_rm_with_one_nonexistant(self):
         write('existant', 'contents')

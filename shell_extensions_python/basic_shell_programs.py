@@ -82,7 +82,6 @@ def rm(*paths, ignore_missing=False, recursively=False, interactive=True):
     recursively: remove a directory recursively if it contains values
     interactive: prompt rather than erroring if you encounter a file you are not allowed to delete
     """
-    # TODO handle symbolic links better
     removes = [_rm(path, ignore_missing, recursively, interactive) for path in paths]
     for remove in removes:
         remove()
@@ -99,7 +98,9 @@ def _rm(path, ignore_missing, recursively, interactive):
             return lambda: None
         else:
             raise FileNotFoundError("The file %s cannot be removed as it does not exist" % path)
-    elif os.path.isdir(path) and not os.path.islink(path):
+    elif os.path.islink(path) or os.path.isfile(path):
+        return lambda: os.remove(path)
+    elif os.path.isdir(path):
         if ls(path) == []:
             return lambda: os.rmdir(path)
         elif recursively:
@@ -111,10 +112,8 @@ def _rm(path, ignore_missing, recursively, interactive):
             return lambda: None
         else:
             raise CannotRemoveDirectoryError(path)
-    elif os.path.isfile(path):
-        return lambda: os.remove(path)
     else:
-        raise RuntimeError("The path %s represents an existing file that is not a directory or normal file" % path)
+        raise RuntimeError("The path %s represents an existing file that is not a directory, normal file, or link" % path)
 
 def mv(src, dst, overwrite=False, create_dir=True):
     """
