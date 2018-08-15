@@ -19,7 +19,7 @@ class TestRun(unittest.TestCase):
     @reset
     def test_invalid_args(self):
         self.assertRaises(RuntimeError, lambda: r(None))
-        self.assertRaises(RuntimeError, lambda: r([['abc']]))
+        self.assertRaises(RuntimeError, lambda: re(['a']))
     @reset
     def test_multiple_lines(self):
         self.assertEqual('2\n3\n', r('echo 2; echo 3', mode=Collect).stdout())
