@@ -113,7 +113,8 @@ def _rm(path, ignore_missing, recursively, interactive):
         else:
             raise CannotRemoveDirectoryError(path)
     else:
-        raise RuntimeError("The path %s represents an existing file that is not a directory, normal file, or link" % path)
+        raise RuntimeError("The path %s represents an existing file"
+                           + " that is not a directory, normal file, or link" % path)
 
 def mv(src, dst, overwrite=False, create_dir=True):
     """
