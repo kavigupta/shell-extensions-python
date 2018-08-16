@@ -8,6 +8,8 @@ from .pipeline_result import PipelineResult
 from .pipeline_map import PipelineMap, LineMap
 from .fd import FD
 
+# TODO add way to flush streams
+
 class Pipeline(metaclass=ABCMeta):
     """
     Represents an iterable with a standard output and error that both occur in time,
