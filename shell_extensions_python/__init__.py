@@ -15,5 +15,6 @@ from .pipeline_consumer import Terminal, Collect
 from .shell_pickles import pload, ploads, psaves, psave
 from .pipeline_map import sort
 from .grep import cgrep
+from .fd import FD
 
 from .colors import PrintColors

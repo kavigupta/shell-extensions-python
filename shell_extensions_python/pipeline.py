@@ -77,6 +77,8 @@ class Pipeline(metaclass=ABCMeta):
         """
         if isinstance(mapper, PipelineMap):
             return MappedPipeline(self, mapper)
+        elif isinstance(mapper, type) and issubclass(mapper, PipelineMap):
+            return MappedPipeline(self, mapper(fds))
         elif callable(mapper):
             return MappedPipeline(self, LineMap(mapper, fds))
         else:

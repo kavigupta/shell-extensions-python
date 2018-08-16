@@ -32,15 +32,19 @@ class LineMap(PipelineMap):
             else:
                 yield fd, line
 
-class _Sort(PipelineMap):
+class sort(PipelineMap): # pylint: disable=C0103
+    """
+    Sorts the contents using natural order
+    """
+    def __init__(self, fds):
+        self.__fds = fds
     def map(self, pipeline_stream):
-        stdouts = []
+        to_sort = []
         for fd, line in pipeline_stream:
-            if fd == FD.stdout:
-                stdouts.append(line)
+            if fd in self.__fds:
+                to_sort.append((fd, line))
             else:
                 yield fd, line
-        for line in sorted(stdouts):
-            yield FD.stdout, line
+        for fd, line in sorted(to_sort, key=lambda fd_line: fd_line[1]):
+            yield fd, line
 
-sort = _Sort() # pylint: disable=C0103
