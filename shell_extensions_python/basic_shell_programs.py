@@ -35,7 +35,7 @@ def ls(path='.', sort_key=lambda x: x, a=True, full=False):
         result = [join(path, x) for x in result]
     return ShellList(result)
 
-def cat(filename, mode=''):
+def read(filename, mode=''):
     """
     Loads the given file as a ShellStr.
     """

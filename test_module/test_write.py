@@ -1,7 +1,7 @@
 
 import unittest
 
-from shell_extensions_python import write, ls, cat, rm
+from shell_extensions_python import write, ls, read, rm
 from shell_extensions_python.shell_types import ShellBool
 
 from .utilities import reset
@@ -11,18 +11,18 @@ class TestWrite(unittest.TestCase):
     def test_add_file(self):
         write('test.py', 'hi!!!')
         self.assertEqual(ls(), ['test.py'])
-        self.assertEqual(cat('test.py'), 'hi!!!')
+        self.assertEqual(read('test.py'), 'hi!!!')
         rm('test.py')
     @reset
     def test_write_options(self):
         write('test', 'first line\n')
         self.assertEqual(ls(), ['test'])
-        self.assertEqual(cat('test'), 'first line\n')
+        self.assertEqual(read('test'), 'first line\n')
         self.assertRaises(FileExistsError, lambda: write('test', 'first line\n'))
         write('test', 'first line modified\n', clobber=True)
-        self.assertEqual(cat('test'), 'first line modified\n')
+        self.assertEqual(read('test'), 'first line modified\n')
         write('test', 'second line\n', append=True)
-        self.assertEqual(cat('test'), 'first line modified\nsecond line\n')
+        self.assertEqual(read('test'), 'first line modified\nsecond line\n')
         rm('test')
     @reset
     def test_Return_value(self):

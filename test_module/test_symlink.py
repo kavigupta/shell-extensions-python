@@ -1,7 +1,7 @@
 
 import unittest
 
-from shell_extensions_python import mkdir, rm, symlink, ls, write, cat
+from shell_extensions_python import mkdir, rm, symlink, ls, write, read
 
 from .utilities import reset
 
@@ -10,14 +10,14 @@ class TestSymlink(unittest.TestCase):
     def test_basic_symlink(self):
         write('file', 'contents')
         symlink('file', 'link')
-        self.assertEqual('contents', cat('link'))
+        self.assertEqual('contents', read('link'))
         rm('file', 'link')
     @reset
     def test_basic_symlink_to_folder(self):
         mkdir('folder')
         write('folder/file', 'contents')
         symlink('folder/file', 'link')
-        self.assertEqual('contents', cat('folder/file'))
+        self.assertEqual('contents', read('folder/file'))
         rm('link')
         rm('folder', recursively=True)
     @reset
@@ -26,9 +26,9 @@ class TestSymlink(unittest.TestCase):
         write('file2', 'second contents')
         symlink('file1', 'link')
         self.assertRaises(RuntimeError, lambda: symlink('file2', 'link'))
-        self.assertEqual('first contents', cat('link'))
+        self.assertEqual('first contents', read('link'))
         symlink('file2', 'link', overwrite=True)
-        self.assertEqual('second contents', cat('link'))
+        self.assertEqual('second contents', read('link'))
         rm('file1', 'file2', 'link')
     @reset
     def test_symlink_overwrite_folder(self):
@@ -43,5 +43,5 @@ class TestSymlink(unittest.TestCase):
         self.assertRaises(FileNotFoundError, lambda: symlink('nonexistant', 'link'))
         symlink('nonexistant', 'link', ignore_missing=True)
         write('nonexistant', 'contents')
-        self.assertEqual('contents', cat('link'))
+        self.assertEqual('contents', read('link'))
         rm('nonexistant', 'link')

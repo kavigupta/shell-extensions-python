@@ -33,12 +33,12 @@ class Process(Pipeline):
     def _end(self):
         return self.proc.wait()
 
-class read(Pipeline): # pylint: disable=C0103
+class cat(Pipeline): # pylint: disable=C0103
     """
     A pipeline created by reading a file to stdout
 
     Return code 0 if successful, 1 if there was an error reading the file (e.g., not found)
-        Acts like cat
+        Acts like the unix utility cat
     """
     def __init__(self, filename):
         super().__init__()

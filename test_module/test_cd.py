@@ -3,7 +3,7 @@ from os.path import expanduser, join
 
 import unittest
 
-from shell_extensions_python import pwd, cd, rm, write, cat, mkdir
+from shell_extensions_python import pwd, cd, rm, write, read, mkdir
 from shell_extensions_python.shell_types import ShellBool
 
 from .utilities import reset, INITIAL_PWD
@@ -37,7 +37,7 @@ class TestCd(unittest.TestCase):
         cd(1)
         self.assertEqual(join(INITIAL_PWD, 'path'), pwd())
         cd(INITIAL_PWD)
-        self.assertEqual(cat('path/to/folder/file.txt'), "hello")
+        self.assertEqual(read('path/to/folder/file.txt'), "hello")
         rm('path', recursively=True)
     @reset
     def test_return_code(self):
