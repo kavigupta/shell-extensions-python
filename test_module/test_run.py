@@ -25,6 +25,12 @@ class TestRun(unittest.TestCase):
         self.assertRaises(RuntimeError, lambda: r('echo 2; echo 3', mode=Collect).stdout(single_line=True))
         self.assertEqual(['2', '3'], r('echo 2; echo 3', mode=Collect).stdout(as_lines=True))
         self.assertRaises(RuntimeError, lambda: r('echo 2; echo 3', mode=Collect).stdout(as_lines=True, single_line=True))
+        self.assertRaises(RuntimeError, lambda: r('echo 2; echo 3', mode=Collect).stdout(as_lines=True, raw=True))
+        self.assertRaises(RuntimeError, lambda: r('echo 2; echo 3', mode=Collect).stdout(single_line=True, raw=True))
+        self.assertRaises(RuntimeError, lambda: r('echo 2; echo 3', mode=Collect).stdout(as_lines=True, single_line=True, raw=True))
+    @reset
+    def test_raw_output(self):
+        self.assertEqual([b"2\n", b"3\n"], r('echo 2; echo 3', mode=Collect).stdout(raw=True))
     @reset
     def test_exit_code(self):
         self.assertEqual(True, bool(r('true')))

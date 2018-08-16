@@ -17,10 +17,12 @@ class PipelineResult:
     def __repr__(self):
         return ""
     @staticmethod
-    def _process(raw, single_line, as_lines):
-        result = b"".join(raw).decode('utf-8')
-        if single_line and as_lines:
-            raise RuntimeError("Incompatible arguments: single_line=True, as_lines=True")
+    def _process(raw_data, single_line, as_lines, raw):
+        if single_line + as_lines + raw > 1:
+            raise RuntimeError("Incompatible arguments: only one of `single_line, as_lines, raw` can be true")
+        if raw:
+            return raw_data
+        result = b"".join(raw_data).decode('utf-8')
         if single_line:
             lines = [x for x in result.split(linesep) if x]
             if len(lines) != 1:
@@ -31,18 +33,18 @@ class PipelineResult:
             if result[-1] == "":
                 result.pop()
         return result
-    def stdout(self, single_line=False, as_lines=False):
+    def stdout(self, single_line=False, as_lines=False, raw=False):
         """
         Output the stdout as a string with possible modifications
             single_line: strip away all leading and trailing whitespace, and error if there is more than one line
             as_lines: return a list of lines.
         """
-        return self._process(self._stdout, single_line=single_line, as_lines=as_lines)
-    def stderr(self, single_line=False, as_lines=False):
+        return self._process(self._stdout, single_line=single_line, as_lines=as_lines, raw=raw)
+    def stderr(self, single_line=False, as_lines=False, raw=False):
         """
         Output the stderr. See `PipelineResult.stdout` for details
         """
-        return self._process(self._stderr, single_line=single_line, as_lines=as_lines)
+        return self._process(self._stderr, single_line=single_line, as_lines=as_lines, raw=raw)
     def _combine(self, other, returncode_combiner):
         # pylint: disable=protected-access
         return PipelineResult(self._stdout + other._stdout,
