@@ -1,6 +1,6 @@
 import unittest
 
-from shell_extensions_python import s, Collect, sort, FD, head
+from shell_extensions_python import s, Collect, sort, FD, head, retain
 
 from .utilities import reset
 
@@ -61,3 +61,18 @@ class TestMap(unittest.TestCase):
         result = s("; sleep 0.01; ".join(command)) % head(5) > Collect
         self.assertEqual("1\n3\n5\n", result.stdout())
         self.assertEqual("2\n4\n", result.stderr())
+    @reset
+    def test_retain_stdout(self):
+        result = s('echo 1; echo 2; echo 3; echo 4; echo 5 >&2; echo 6 >&2') | retain(lambda x: int(x) % 2) > Collect
+        self.assertEqual("1\n3\n", result.stdout())
+        self.assertEqual("5\n6\n", result.stderr())
+    @reset
+    def test_retain_stderr(self):
+        result = s('echo 1; echo 2; echo 3; echo 4; echo 5 >&2; echo 6 >&2') / retain(lambda x: int(x) % 2) > Collect
+        self.assertEqual("1\n2\n3\n4\n", result.stdout())
+        self.assertEqual("5\n", result.stderr())
+    @reset
+    def test_retain_both(self):
+        result = s('echo 1; echo 2; echo 3; echo 4; echo 5 >&2; echo 6 >&2') % retain(lambda x: int(x) % 2) > Collect
+        self.assertEqual("1\n3\n", result.stdout())
+        self.assertEqual("5\n", result.stderr())

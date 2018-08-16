@@ -66,3 +66,16 @@ def head(count):
                 if fd in self.__fds:
                     current_count += 1
     return _Head
+
+def retain(filter_fn):
+    """
+    Retains only the elements matching filter_fn
+    """
+    class _Retain(PipelineMap):
+        def __init__(self, fds):
+            self.__fds = fds
+        def map(self, pipeline_stream):
+            for fd, line in pipeline_stream:
+                if fd not in self.__fds or filter_fn(line):
+                    yield fd, line
+    return _Retain

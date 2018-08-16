@@ -13,7 +13,7 @@ from .basic_shell_programs import ls, read, pwd, cd, globs, glob, mkdir, write, 
 from .run_shell_commands import r, re, s, throw, less, cp, ProcessFailedException, cat
 from .pipeline_consumer import Terminal, Collect
 from .shell_pickles import pload, ploads, psaves, psave
-from .pipeline_map import sort, head
+from .pipeline_map import sort, head, retain
 from .grep import cgrep
 from .fd import FD
 
