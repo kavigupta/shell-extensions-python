@@ -4,8 +4,6 @@ Tools for mapping over pipelines
 
 from abc import ABCMeta, abstractmethod
 
-from .fd import FD
-
 class PipelineMap(metaclass=ABCMeta):
     """
     A map over a pipeline's stdout/stderr stream
