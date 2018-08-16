@@ -5,7 +5,8 @@ A simple interface to git
 from enum import Enum
 from collections import namedtuple
 
-from .run_shell_commands import re, Collect, throw, ProcessFailedException
+from .run_shell_commands import re, throw, ProcessFailedException
+from .pipeline_consumer import Collect
 from .basic_shell_programs import pwd
 from .shell_types import ShellBool
 
