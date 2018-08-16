@@ -37,7 +37,7 @@ class Process(Pipeline):
     def _end(self):
         return self.proc.wait()
 
-class Consumer(metaclass=ABCMeta):
+class PipelineConsumer(metaclass=ABCMeta):
     """
     Represents a callback that can consume lines and optionally stores them
     """
@@ -57,7 +57,7 @@ class Consumer(metaclass=ABCMeta):
         Returns the stderr seen
         """
 
-class StderrRed(Consumer): # pragma: no cover
+class StderrRed(PipelineConsumer): # pragma: no cover
     """
     Prints standard out and standard error to the screen.
     """
@@ -74,7 +74,7 @@ class StderrRed(Consumer): # pragma: no cover
     def stderr():
         return b""
 
-class Collect(Consumer):
+class Collect(PipelineConsumer):
     """
     Collects standard out and standard error in memory
     """
