@@ -39,10 +39,10 @@ class Terminal(PipelineConsumer): # pragma: no cover
             print(PrintColors.red + line.decode('utf-8') + PrintColors.reset, end="")
     @staticmethod
     def stdout():
-        return b""
+        return []
     @staticmethod
     def stderr():
-        return b""
+        return []
 
 class Collect(PipelineConsumer):
     """
@@ -54,6 +54,6 @@ class Collect(PipelineConsumer):
     def consume(self, fd, line):
         {FD.stdout : self.stdouts, FD.stderr : self.stderrs}[fd].append(line)
     def stdout(self):
-        return b"".join(self.stdouts)
+        return self.stdouts
     def stderr(self):
-        return b"".join(self.stderrs)
+        return self.stderrs

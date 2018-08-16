@@ -18,7 +18,7 @@ class PipelineResult:
         return ""
     @staticmethod
     def _process(raw, single_line, as_lines):
-        result = raw.decode('utf-8')
+        result = b"".join(raw).decode('utf-8')
         if single_line and as_lines:
             raise RuntimeError("Incompatible arguments: single_line=True, as_lines=True")
         if single_line:

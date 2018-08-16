@@ -56,7 +56,7 @@ class Pipeline(metaclass=ABCMeta):
         """
         if consumer_type is None:
             list(self)
-            return PipelineResult(b"", b"", self.exitcode)
+            return PipelineResult([], [], self.exitcode)
         consumer = consumer_type()
         for fd, line in self:
             consumer.consume(fd, line)
