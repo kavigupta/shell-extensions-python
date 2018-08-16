@@ -2,11 +2,10 @@
 Pipelines are iterables with an interleaved standard out and standard error, which support
     operations such as piping into a collector and mapping
 """
-# TODO add mapping
-
 
 from abc import ABCMeta, abstractmethod
 from .pipeline_result import PipelineResult
+from .pipeline_map import PipelineMap, LineMap
 from .fd import FD
 
 class Pipeline(metaclass=ABCMeta):
@@ -54,3 +53,47 @@ class Pipeline(metaclass=ABCMeta):
         for fd, line in self:
             consumer.consume(fd, line)
         return PipelineResult(consumer.stdout(), consumer.stderr(), self.exitcode)
+    def __or__(self, mapper):
+        """
+        Maps the given mapper over this pipeline.
+            If mapper is just a function, use a line mapping over stdout
+        """
+        return self._map(mapper, {FD.stdout})
+    def __truediv__(self, mapper):
+        """
+        Maps the given mapper over this pipeline.
+            If mapper is just a function, use a line mapping over stderr
+        """
+        return self._map(mapper, {FD.stderr})
+    def __mod__(self, mapper):
+        """
+        Maps the given mapper over this pipeline.
+            If mapper is just a function, use a line mapping over both stdout and stderr
+        """
+        return self._map(mapper, {FD.stdout, FD.stderr})
+    def _map(self, mapper, fds):
+        """
+        Map the given mapper over this pipeline. If the mapper is just a function, map over fds
+        """
+        if isinstance(mapper, PipelineMap):
+            return MappedPipeline(self, mapper)
+        elif callable(mapper):
+            return MappedPipeline(self, LineMap(mapper, fds))
+        else:
+            raise RuntimeError("Invalid mapping object, should be a "
+                               + "PipelineMap or callable but was %s" % type(mapper))
+
+class MappedPipeline(Pipeline):
+    """
+    Represents the result of a map operation
+    """
+    def __init__(self, pipeline, mapper):
+        super().__init__()
+        self.__pipeline = pipeline
+        self.__mapper = mapper
+    def _lines(self):
+        # pylint: disable=W0212
+        yield from self.__mapper.map(self.__pipeline._lines())
+    def _end(self):
+        # pylint: disable=W0212
+        return self.__pipeline._end()
