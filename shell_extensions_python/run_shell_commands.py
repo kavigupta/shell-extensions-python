@@ -64,7 +64,7 @@ class cat(Pipeline): # pylint: disable=C0103
 def re(*command, mode=None):
     """
     Run the given command, and optionally gather the stdout and stderr
-        mode=Collect to gather, mode=StderrRed to print normal/red for stdout/stderr
+        mode=Collect to gather, mode=Terminal to print normal/red for stdout/stderr
 
     Does not do any shell expansion
     """

@@ -27,7 +27,7 @@ class PipelineConsumer(metaclass=ABCMeta):
         Returns the stderr seen
         """
 
-class StderrRed(PipelineConsumer): # pragma: no cover
+class Terminal(PipelineConsumer): # pragma: no cover
     """
     Prints standard out and standard error to the screen.
     """
