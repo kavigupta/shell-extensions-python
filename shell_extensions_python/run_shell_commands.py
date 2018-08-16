@@ -102,7 +102,7 @@ def s(command, print_direct=False, raw_bytes=False):
         raise RuntimeError("command argument to s must be of type str but was %s" % type(command))
     return Process(subprocess.Popen(command, shell=True, stdout=pipe, stderr=pipe), print_direct, raw_bytes=raw_bytes)
 
-def throw(exc):
+def throw(exc): # pragma: no cover
     """
     Raise the given error. To be used like
         r('make') or throw(RuntimeError("make failed"))
