@@ -3,11 +3,11 @@ Various functions to help run shell commands.
 """
 
 from abc import ABCMeta, abstractmethod
-from enum import Enum
+
 
 import subprocess
-import os
 
+from .pipeline import FD, Pipeline
 from .colors import PrintColors
 from .path_manipulation import expand_user
 from .tcombinator import TCombinator
@@ -18,81 +18,15 @@ class ProcessFailedException(RuntimeError):
     """
     pass
 
-class ShellResult:
-    """
-    Represents the result of calling a shell program
-    """
-    def __init__(self, stdout, stderr, returncode):
-        self._stdout = stdout
-        self._stderr = stderr
-        self.returncode = returncode
-    def __bool__(self):
-        return self.returncode == 0
-    def __repr__(self):
-        return ""
-    @staticmethod
-    def _process(raw, single_line, as_lines):
-        result = raw.decode('utf-8')
-        if single_line and as_lines:
-            raise RuntimeError("Incompatible arguments: single_line=True, as_lines=True")
-        if single_line:
-            lines = [x for x in result.split(os.linesep) if x]
-            if len(lines) != 1:
-                raise RuntimeError("Not exactly one line: %s" % lines)
-            result = lines[0]
-        elif as_lines:
-            result = result.split(os.linesep)
-            if result[-1] == "":
-                result.pop()
-        return result
-    def stdout(self, single_line=False, as_lines=False):
-        """
-        Output the stdout as a string with possible modifications
-            single_line: strip away all leading and trailing whitespace, and error if there is more than one line
-            as_lines: return a list of lines.
-        """
-        return self._process(self._stdout, single_line=single_line, as_lines=as_lines)
-    def _combine(self, other, returncode_combiner):
-        # pylint: disable=protected-access
-        return ShellResult(self._stdout + other._stdout,
-                           self._stderr + other._stderr,
-                           returncode_combiner(self.returncode, other.returncode))
-    def __or__(self, other):
-        """
-        r(x) | r(y) to run both x and y and return success if either returned success
-        """
-        # not (not x or not y)
-        return self._combine(other, lambda x, y: x and y)
-    def __and__(self, other):
-        """
-        r(x) & r(y) to run both x and y and return success if both returned success
-        """
-        # not (not x and not y)
-        return self._combine(other, lambda x, y: x or y)
-    def __add__(self, other):
-        """
-        r(x) + r(y) to run both x and y and return success if y returned success. In bash:
-            { x; y }
-        """
-        # not (not x and not y)
-        return self._combine(other, lambda x, y: y)
-
-class FD(Enum):
-    """
-    File descriptors, either stdout or stderr
-    """
-    stdout = 1
-    stderr = 2
-
-class Process:
+class Process(Pipeline):
     """
     Represents a process, which can be iterated through and has several methods
     """
     def __init__(self, proc, print_direct):
+        super().__init__()
         self.proc = proc
-        self._exitcode = None
         self.print_direct = print_direct
-    def __iter__(self):
+    def _lines(self):
         if not self.print_direct:
             yield from TCombinator(
                 ((FD.stdout, line) for line in self.proc.stdout),
@@ -100,26 +34,8 @@ class Process:
             )
             self.proc.stdout.close()
             self.proc.stderr.close()
-        self._exitcode = self.proc.wait()
-    @property
-    def exitcode(self):
-        """
-        Get the exit code for the underlying process. Throws an error if the process isn't complete
-        """
-        if self._exitcode is not None:
-            return self._exitcode
-        raise RuntimeError("No exit code for the current process")
-    def __gt__(self, consumer_type):
-        """
-        Runs the given shell consumer on the contents of this process, then returns the exit code
-        """
-        if consumer_type is None:
-            list(self)
-            return ShellResult(b"", b"", self.exitcode)
-        consumer = consumer_type()
-        for fd, line in self:
-            consumer.consume(fd, line)
-        return ShellResult(consumer.stdout(), consumer.stderr(), self.exitcode)
+    def _end(self):
+        return self.proc.wait()
 
 class Consumer(metaclass=ABCMeta):
     """

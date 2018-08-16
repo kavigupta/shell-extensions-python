@@ -9,7 +9,7 @@ from enum import Enum
 from colorama import Fore, Style
 
 from .path_manipulation import join
-from .run_shell_commands import ShellResult
+from .pipeline_result import PipelineResult
 from .shell_types import ShellBool
 
 class Interactive:
@@ -58,7 +58,7 @@ def is_displayed(value): # pragma: no cover
     """
     Whether or not the given value should be displayed on the screen
     """
-    return not isinstance(value, (ShellBool, ShellResult))
+    return not isinstance(value, (ShellBool, PipelineResult))
 
 def modified_displayhook(value, original_displayhook=sys.displayhook): # pragma: no cover
     """
