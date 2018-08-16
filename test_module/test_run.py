@@ -1,7 +1,7 @@
 
 import unittest
 
-from shell_extensions_python import write, ls, r, re, s, rm, Collect, ProcessFailedException
+from shell_extensions_python import write, ls, r, re, s, rm, Collect
 from shell_extensions_python.run_shell_commands import FD
 
 from .utilities import reset
