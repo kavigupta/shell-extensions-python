@@ -5,6 +5,9 @@ Represents the result of a pipeline, which contains a recorded standard output, 
 from os import linesep
 
 def concatenate_all_to_string(items):
+    """
+    Concatenate a list of strings or bytes objects to a string, possibly utf-8 encoding it
+    """
     if not items:
         return ""
     if isinstance(items[0], bytes):
