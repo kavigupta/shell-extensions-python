@@ -4,7 +4,8 @@ Various functions to help run shell commands.
 
 import subprocess
 
-from .pipeline import FD, Pipeline
+from .fd import FD
+from .pipeline import Pipeline
 from .path_manipulation import expand_user
 from .tcombinator import TCombinator
 

@@ -5,7 +5,7 @@ Classes for consuming pipelines, and then returning the standard out and standar
 from abc import ABCMeta, abstractmethod
 
 from .colors import PrintColors
-from .pipeline import FD
+from .fd import FD
 
 class PipelineConsumer(metaclass=ABCMeta):
     """

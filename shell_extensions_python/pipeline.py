@@ -6,15 +6,8 @@ Pipelines are iterables with an interleaved standard out and standard error, whi
 
 
 from abc import ABCMeta, abstractmethod
-from enum import Enum
 from .pipeline_result import PipelineResult
-
-class FD(Enum):
-    """
-    File descriptors, either stdout or stderr
-    """
-    stdout = 1
-    stderr = 2
+from .fd import FD
 
 class Pipeline(metaclass=ABCMeta):
     """
