@@ -1,6 +1,6 @@
 import unittest
 
-from shell_extensions_python import s, Collect, sort, FD
+from shell_extensions_python import s, Collect, sort, FD, head
 
 from .utilities import reset
 
@@ -45,3 +45,16 @@ class TestMap(unittest.TestCase):
         self.assertEqual("0\n4\n", result.stderr())
         self.assertEqual([(FD.stderr, b"0\n"), (FD.stdout, b"2\n"), (FD.stdout, b"3\n"), (FD.stderr, b"4\n")],
                          list(s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') % sort))
+    @reset
+    def test_head_basic(self):
+        result = s('echo 1; echo 2; echo 3; echo 4; echo 5') | head(3) > Collect
+        self.assertEqual("1\n2\n3\n", result.stdout())
+    @reset
+    def test_head_on_wrong_stream(self):
+        result = s('echo 1; echo 2; echo 3; echo 4; echo 5') / head(3) > Collect
+        self.assertEqual("1\n2\n3\n4\n5\n", result.stdout())
+    @reset
+    def test_head_on_heterogenous_stream(self):
+        result = s('echo 1; echo 2 >&2; echo 3; echo 4 >&2; echo 5; echo 6 >&2; echo 7; echo 8 >&2') % head(5) > Collect
+        self.assertEqual("1\n3\n5\n", result.stdout())
+        self.assertEqual("2\n4\n", result.stderr())

@@ -48,3 +48,21 @@ class sort(PipelineMap): # pylint: disable=C0103
         for fd, line in sorted(to_sort, key=lambda fd_line: fd_line[1]):
             yield fd, line
 
+def head(count):
+    """
+    Gets the first `count` elements from a stream
+    """
+    class _Head(PipelineMap):
+        def __init__(self, fds):
+            self.__fds = fds
+        def map(self, pipeline_stream):
+            current_count = 0
+            continue_yielding = True
+            for fd, line in pipeline_stream:
+                if current_count >= count:
+                    continue_yielding = False
+                if continue_yielding or fd not in self.__fds:
+                    yield fd, line
+                if fd in self.__fds:
+                    current_count += 1
+    return _Head
