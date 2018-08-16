@@ -33,6 +33,34 @@ class Process(Pipeline):
     def _end(self):
         return self.proc.wait()
 
+class read(Pipeline): # pylint: disable=C0103
+    """
+    A pipeline created by reading a file to stdout
+
+    Return code 0 if successful, 1 if there was an error reading the file (e.g., not found)
+        Acts like cat
+    """
+    def __init__(self, filename):
+        super().__init__()
+        try:
+            self.__handle = open(filename, "rb")
+            self.__errors = []
+            self.__exitcode = 0
+        except IOError as e:
+            self.__handle = None
+            self.__errors = [str(e).encode('utf-8')]
+            self.__exitcode = 1
+    def _lines(self):
+        if self.__handle is not None:
+            for line in self.__handle:
+                yield FD.stdout, line
+        for error in self.__errors:
+            yield FD.stderr, error
+    def _end(self):
+        if self.__handle is not None:
+            self.__handle.close()
+        return self.__exitcode
+
 def re(*command, mode=None):
     """
     Run the given command, and optionally gather the stdout and stderr
