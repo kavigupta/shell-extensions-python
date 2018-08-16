@@ -16,5 +16,6 @@ from .shell_pickles import pload, ploads, psaves, psave
 from .pipeline_map import sort, head, retain
 from .grep import cgrep
 from .fd import FD
+from .collectors import Stdout, Stderr, Both
 
 from .colors import PrintColors

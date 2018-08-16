@@ -55,6 +55,11 @@ class Pipeline(metaclass=ABCMeta):
         for fd, line in self:
             consumer.consume(fd, line)
         return PipelineResult(consumer.stdout(), consumer.stderr(), self.exitcode)
+    def __ge__(self, collector):
+        """
+        self >= collector is equivalent to collector(self)
+        """
+        return collector(self)
     def __or__(self, mapper):
         """
         Maps the given mapper over this pipeline.

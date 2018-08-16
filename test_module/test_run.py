@@ -1,7 +1,7 @@
 
 import unittest
 
-from shell_extensions_python import write, ls, r, re, s, rm, Collect
+from shell_extensions_python import write, ls, r, re, s, rm, Collect, Stdout, Stderr, Both
 from shell_extensions_python.run_shell_commands import FD
 
 from .utilities import reset
@@ -69,3 +69,17 @@ class TestRun(unittest.TestCase):
         result = r('echo 2; true', mode=Collect) + r('echo 3; false', mode=Collect)
         self.assertEqual('2\n3\n', result.stdout())
         self.assertFalse(result)
+
+class TestCollectors(unittest.TestCase):
+    @reset
+    def test_stdout(self):
+        self.assertEqual((2, 3, 5), s('echo 2; echo 3; echo 4 >&2; echo 5') % int >= Stdout())
+        self.assertEqual({2, 3, 5}, s('echo 2; echo 3; echo 4 >&2; echo 5') % int >= Stdout(set))
+    @reset
+    def test_stderr(self):
+        self.assertEqual((4,), s('echo 2; echo 3; echo 4 >&2; echo 5') % int >= Stderr())
+        self.assertEqual({4}, s('echo 2; echo 3; echo 4 >&2; echo 5') % int >= Stderr(set))
+    @reset
+    def test_stdout_stderr(self):
+        self.assertEqual((2, 3, 4, 5), s('echo 2; echo 3; sleep 0.01; echo 4 >&2; sleep 0.01; echo 5') % int >= Both())
+        self.assertEqual({2, 3, 4, 5}, s('echo 2; echo 3; sleep 0.01; echo 4 >&2; sleep 0.01; echo 5') % int >= Both(set))
