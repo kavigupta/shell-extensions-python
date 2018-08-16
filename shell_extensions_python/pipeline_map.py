@@ -9,7 +9,7 @@ class PipelineMap(metaclass=ABCMeta):
     A map over a pipeline's stdout/stderr stream
     """
     @abstractmethod
-    def map(self, pipeline_stream):
+    def map(self, pipeline_stream): # pragma: no cover
         """
         Map over pipeline streams
         """

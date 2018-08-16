@@ -18,14 +18,14 @@ class Pipeline(metaclass=ABCMeta):
     def __init__(self):
         self._exitcode = None
     @abstractmethod
-    def _lines(self):
+    def _lines(self): # pragma: no cover
         """
         Yields several (FD, str) representing lines and the file descriptors they
             find themselves on
         """
         pass
     @abstractmethod
-    def _end(self):
+    def _end(self): # pragma: no cover
         """
         Ends the pipeline, performing cleanup, and returing an exit code.
             This uses unix conventions, 0 for success, anything else is failure
