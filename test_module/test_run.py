@@ -30,7 +30,7 @@ class TestRun(unittest.TestCase):
         self.assertRaises(RuntimeError, lambda: r('echo 2; echo 3', mode=Collect).stdout(as_lines=True, single_line=True, raw=True))
     @reset
     def test_raw_output(self):
-        self.assertEqual([b"2\n", b"3\n"], r('echo 2; echo 3', mode=Collect).stdout(raw=True))
+        self.assertEqual(["2\n", "3\n"], r('echo 2; echo 3', mode=Collect).stdout(raw=True))
     @reset
     def test_exit_code(self):
         self.assertEqual(True, bool(r('true')))
@@ -41,7 +41,7 @@ class TestRun(unittest.TestCase):
     @reset
     def test_callback_order(self):
         result = list(s('echo abc >&2; sleep 0.1; echo def'))
-        self.assertEqual([(FD.stderr, b'abc\n'), (FD.stdout, b'def\n')], result)
+        self.assertEqual([(FD.stderr, 'abc\n'), (FD.stdout, 'def\n')], result)
     @reset
     def test_get_exitcode(self):
         command = s('echo abc')

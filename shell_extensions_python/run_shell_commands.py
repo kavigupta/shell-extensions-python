@@ -19,20 +19,25 @@ class Process(Pipeline):
     """
     A pipeline created by the standard out and error of a process
     """
-    def __init__(self, proc, print_direct):
+    def __init__(self, proc, print_direct, raw_bytes):
         super().__init__()
         self.proc = proc
         self.print_direct = print_direct
+        self.raw_bytes = raw_bytes
     def _lines(self):
         if not self.print_direct:
             yield from TCombinator(
-                ((FD.stdout, line) for line in self.proc.stdout),
-                ((FD.stderr, line) for line in self.proc.stderr)
+                ((FD.stdout, self.__encode(line)) for line in self.proc.stdout),
+                ((FD.stderr, self.__encode(line)) for line in self.proc.stderr)
             )
             self.proc.stdout.close()
             self.proc.stderr.close()
     def _end(self):
         return self.proc.wait()
+    def __encode(self, line):
+        if self.raw_bytes:
+            return line
+        return line.decode('utf-8')
 
 class cat(Pipeline): # pylint: disable=C0103
     """
@@ -41,10 +46,10 @@ class cat(Pipeline): # pylint: disable=C0103
     Return code 0 if successful, 1 if there was an error reading the file (e.g., not found)
         Acts like the unix utility cat
     """
-    def __init__(self, filename):
+    def __init__(self, filename, raw_bytes=False):
         super().__init__()
         try:
-            self.__handle = open(filename, "rb")
+            self.__handle = open(filename, "r" + "b" * raw_bytes)
             self.__errors = []
             self.__exitcode = 0
         except IOError as e:
@@ -77,7 +82,7 @@ def r(command, mode=None):
     """
     return s(command, print_direct=mode is None) > mode
 
-def se(*command, print_direct=False):
+def se(*command, print_direct=False, raw_bytes=False):
     """
     Run the given command, and allow ability to gather output
 
@@ -86,16 +91,16 @@ def se(*command, print_direct=False):
     pipe = None if print_direct else subprocess.PIPE
     if not all(isinstance(x, str) for x in command):
         raise RuntimeError("Cannot run %s: it has non-string elements" % command)
-    return Process(subprocess.Popen(command, stdout=pipe, stderr=pipe), print_direct)
+    return Process(subprocess.Popen(command, stdout=pipe, stderr=pipe), print_direct, raw_bytes=raw_bytes)
 
-def s(command, print_direct=False):
+def s(command, print_direct=False, raw_bytes=False):
     """
     Like se, but does shell expansion on its string argument
     """
     pipe = None if print_direct else subprocess.PIPE
     if not isinstance(command, str):
         raise RuntimeError("command argument to s must be of type str but was %s" % type(command))
-    return Process(subprocess.Popen(command, shell=True, stdout=pipe, stderr=pipe), print_direct)
+    return Process(subprocess.Popen(command, shell=True, stdout=pipe, stderr=pipe), print_direct, raw_bytes=raw_bytes)
 
 def throw(exc):
     """

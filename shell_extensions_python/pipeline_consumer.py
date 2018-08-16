@@ -33,10 +33,16 @@ class Terminal(PipelineConsumer): # pragma: no cover
     """
     @staticmethod
     def consume(fd, line):
+        if isinstance(line, bytes):
+            line = line.decode('utf-8')
+        elif isinstance(line, str):
+            pass
+        else:
+            line = str(line) + "\n"
         if fd == FD.stdout:
-            print(line.decode('utf-8'), end="")
+            print(line, end="")
         elif fd == FD.stderr:
-            print(PrintColors.red + line.decode('utf-8') + PrintColors.reset, end="")
+            print(PrintColors.red + line + PrintColors.reset, end="")
     @staticmethod
     def stdout():
         return []

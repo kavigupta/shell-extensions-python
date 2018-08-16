@@ -43,7 +43,7 @@ class TestMap(unittest.TestCase):
         result = s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') % sort > Collect
         self.assertEqual("2\n3\n", result.stdout())
         self.assertEqual("0\n4\n", result.stderr())
-        self.assertEqual([(FD.stderr, b"0\n"), (FD.stdout, b"2\n"), (FD.stdout, b"3\n"), (FD.stderr, b"4\n")],
+        self.assertEqual([(FD.stderr, "0\n"), (FD.stdout, "2\n"), (FD.stdout, "3\n"), (FD.stderr, "4\n")],
                          list(s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') % sort))
     @reset
     def test_head_basic(self):

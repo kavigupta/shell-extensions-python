@@ -4,6 +4,13 @@ Represents the result of a pipeline, which contains a recorded standard output, 
 """
 from os import linesep
 
+def concatenate_all_to_string(items):
+    if not items:
+        return ""
+    if isinstance(items[0], bytes):
+        return b"".join(items).decode('utf-8')
+    return "".join(items)
+
 class PipelineResult:
     """
     Represents the result of executing a pipeline
@@ -22,7 +29,7 @@ class PipelineResult:
             raise RuntimeError("Incompatible arguments: only one of `single_line, as_lines, raw` can be true")
         if raw:
             return raw_data
-        result = b"".join(raw_data).decode('utf-8')
+        result = concatenate_all_to_string(raw_data)
         if single_line:
             lines = [x for x in result.split(linesep) if x]
             if len(lines) != 1:
