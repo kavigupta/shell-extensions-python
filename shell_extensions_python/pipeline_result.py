@@ -38,6 +38,11 @@ class PipelineResult:
             as_lines: return a list of lines.
         """
         return self._process(self._stdout, single_line=single_line, as_lines=as_lines)
+    def stderr(self, single_line=False, as_lines=False):
+        """
+        Output the stderr. See `PipelineResult.stdout` for details
+        """
+        return self._process(self._stderr, single_line=single_line, as_lines=as_lines)
     def _combine(self, other, returncode_combiner):
         # pylint: disable=protected-access
         return PipelineResult(self._stdout + other._stdout,
