@@ -30,21 +30,21 @@ class TestMap(unittest.TestCase):
         self.assertRaises(RuntimeError, lambda: s('echo 2') | 2)
     @reset
     def test_with_pipeline_mapper_stdout(self):
-        result = s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') | sort > Collect
+        result = s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') | sort() > Collect
         self.assertEqual("2\n3\n", result.stdout())
         self.assertEqual("4\n0\n", result.stderr())
     @reset
     def test_with_pipeline_mapper_stderr(self):
-        result = s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') / sort > Collect
+        result = s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') / sort() > Collect
         self.assertEqual("3\n2\n", result.stdout())
         self.assertEqual("0\n4\n", result.stderr())
     @reset
     def test_with_pipeline_mapper_both(self):
-        result = s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') % sort > Collect
+        result = s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') % sort() > Collect
         self.assertEqual("2\n3\n", result.stdout())
         self.assertEqual("0\n4\n", result.stderr())
         self.assertEqual([(FD.stderr, "0\n"), (FD.stdout, "2\n"), (FD.stdout, "3\n"), (FD.stderr, "4\n")],
-                         list(s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') % sort))
+                         list(s('echo 3; echo 2; echo 4 >&2; echo 0 >&2') % sort()))
     @reset
     def test_head_basic(self):
         result = s('echo 1; echo 2; echo 3; echo 4; echo 5') | head(3) > Collect
