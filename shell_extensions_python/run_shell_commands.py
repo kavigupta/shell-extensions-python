@@ -16,7 +16,7 @@ class ProcessFailedException(RuntimeError):
 
 class Process(Pipeline):
     """
-    Represents a process, which can be iterated through and has several methods
+    A pipeline created by the standard out and error of a process
     """
     def __init__(self, proc, print_direct):
         super().__init__()
