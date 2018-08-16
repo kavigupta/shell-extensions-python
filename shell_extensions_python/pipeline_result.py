@@ -3,16 +3,13 @@ Represents the result of a pipeline, which contains a recorded standard output, 
     and exit code. Can be combined in a variety of ways or converted into a boolean success code.
 """
 from os import linesep
+from .shell_types import decode_line
 
 def concatenate_all_to_string(items):
     """
     Concatenate a list of strings or bytes objects to a string, possibly utf-8 encoding it
     """
-    if not items:
-        return ""
-    if isinstance(items[0], bytes):
-        return b"".join(items).decode('utf-8')
-    return "".join(items)
+    return "".join(map(decode_line, items))
 
 class PipelineResult:
     """

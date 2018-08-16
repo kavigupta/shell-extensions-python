@@ -6,6 +6,7 @@ from abc import ABCMeta, abstractmethod
 
 from .colors import PrintColors
 from .fd import FD
+from .shell_types import decode_line
 
 class PipelineConsumer(metaclass=ABCMeta):
     """
@@ -33,12 +34,7 @@ class Terminal(PipelineConsumer): # pragma: no cover
     """
     @staticmethod
     def consume(fd, line):
-        if isinstance(line, bytes):
-            line = line.decode('utf-8')
-        elif isinstance(line, str):
-            pass
-        else:
-            line = str(line) + "\n"
+        line = decode_line(line)
         if fd == FD.stdout:
             print(line, end="")
         elif fd == FD.stderr:

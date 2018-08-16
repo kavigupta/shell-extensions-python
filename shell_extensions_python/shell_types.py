@@ -61,3 +61,20 @@ class ShellBool(Enum):
         return ShellBool.create(bool(self) | bool(other))
     def __xor__(self, other):
         return ShellBool.create(bool(self) ^ bool(other))
+
+
+class NoNewline(str):
+    """
+    Represents a string that doesn't have a newline after it
+    """
+    pass
+
+def decode_line(line):
+    """
+    If a bytes string, decode literally, if NoNewline, do not add a newline, otherwise add a newline
+    """
+    if isinstance(line, bytes):
+        return line.decode('utf-8')
+    if isinstance(line, NoNewline):
+        return line
+    return line + os.linesep

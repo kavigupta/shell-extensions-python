@@ -7,6 +7,7 @@ import subprocess
 from .fd import FD
 from .pipeline import Pipeline
 from .path_manipulation import expand_user
+from .shell_types import NoNewline
 from .tcombinator import TCombinator
 
 class ProcessFailedException(RuntimeError):
@@ -37,7 +38,7 @@ class Process(Pipeline):
     def __encode(self, line):
         if self.raw_bytes:
             return line
-        return line.decode('utf-8')
+        return NoNewline(line.decode('utf-8'))
 
 class cat(Pipeline): # pylint: disable=C0103
     """
@@ -59,7 +60,7 @@ class cat(Pipeline): # pylint: disable=C0103
     def _lines(self):
         if self.__handle is not None:
             for line in self.__handle:
-                yield FD.stdout, line
+                yield FD.stdout, NoNewline(line)
         for error in self.__errors:
             yield FD.stderr, error
     def _end(self):
