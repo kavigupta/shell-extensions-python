@@ -17,5 +17,6 @@ from .pipeline_map import sort, head, retain
 from .grep import cgrep
 from .fd import FD
 from .collectors import Stdout, Stderr, Both
+from .mapping import col, cols
 
 from .colors import PrintColors
