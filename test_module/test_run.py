@@ -31,6 +31,8 @@ class TestRun(unittest.TestCase):
     @reset
     def test_raw_output(self):
         self.assertEqual(["2\n", "3\n"], r('echo 2; echo 3', mode=Collect).stdout(raw=True))
+        self.assertEqual([b"2\n", b"3\n"], r('echo 2; echo 3', mode=Collect, raw_bytes=True).stdout(raw=True))
+        self.assertEqual("2\n3\n", r('echo 2; echo 3', mode=Collect, raw_bytes=True).stdout())
     @reset
     def test_exit_code(self):
         self.assertEqual(True, bool(r('true')))

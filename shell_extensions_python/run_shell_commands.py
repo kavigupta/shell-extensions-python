@@ -67,20 +67,20 @@ class cat(Pipeline): # pylint: disable=C0103
             self.__handle.close()
         return self.__exitcode
 
-def re(*command, mode=None):
+def re(*command, mode=None, raw_bytes=False):
     """
     Run the given command, and optionally gather the stdout and stderr
         mode=Collect to gather, mode=Terminal to print normal/red for stdout/stderr
 
     Does not do any shell expansion
     """
-    return se(*command, print_direct=mode is None) > mode
+    return se(*command, print_direct=mode is None, raw_bytes=raw_bytes) > mode
 
-def r(command, mode=None):
+def r(command, mode=None, raw_bytes=False):
     """
     Like re, but does shell expansion on its string argument
     """
-    return s(command, print_direct=mode is None) > mode
+    return s(command, print_direct=mode is None, raw_bytes=raw_bytes) > mode
 
 def se(*command, print_direct=False, raw_bytes=False):
     """
